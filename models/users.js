@@ -7,10 +7,14 @@ const userSchema = new mongoose.Schema({
   plan_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Plan",
-    required: true,
+    required: false, // Not required if using OAuth
   },
   role: { type: String, enum: ["user", "admin"], default: "user" },
-  stripe_customer_id: { type: String, required: true },
+  stripe_customer_id: { type: String, required: false },
+  // form id type array when user can have multiple forms and requires is false
+  form_ids: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Form", required: false },
+  ],
   tokens_used: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now },
 });

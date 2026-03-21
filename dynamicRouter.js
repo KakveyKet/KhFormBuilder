@@ -2,12 +2,18 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const axios = require("axios");
+const crypto = require("crypto");
+const mongoose = require("mongoose");
+const Form = require("./models/forms"); // Adjust path if your model is elsewhere
+const formSchemas = require("./formSchemas"); // 🌟 Imported your predefined schemas!
 
 const dynamicRouter = (app) => {
   const routesDir = path.join(__dirname, "routes");
 
-  // Loop through the files in the routes directory
+  // --- ADDED DEBUG LOGS HERE ---
   if (fs.existsSync(routesDir)) {
+    console.log(`\n📁 Scanning for route files in: ${routesDir}`);
+    
     fs.readdirSync(routesDir).forEach((file) => {
       const routePath = path.join(routesDir, file);
 
@@ -15,17 +21,28 @@ const dynamicRouter = (app) => {
         const routeName = file.replace(".js", "");
         const route = require(routePath);
 
+        // Express Routers evaluate as functions
         if (typeof route === "function") {
           app.use(`/api/${routeName}`, route);
+          console.log(`  ✅ Successfully registered route: /api/${routeName}`);
         } else {
-          console.warn(`Skipping invalid route file: ${file}`);
+          console.warn(`  ⚠️ Skipping file: ${file} (It does not export a valid Express Router. Did you forget 'module.exports = router;'?)`);
         }
       }
     });
+    console.log(""); // Empty line for spacing
+  } else {
+    console.error(`\n❌ ERROR: Routes folder not found at ${routesDir}. Please create a 'routes' folder next to your server.js file!\n`);
   }
+  // ------------------------------
 
   app.post("/predict", async (req, res) => {
-    const { inputText } = req.body;
+    const { inputText, creator_id } = req.body; // Added creator_id
+
+    // 🌟 1. Check if the Hugging Face Token is actually loaded
+    if (!process.env.HF_TOKEN) {
+      console.warn("⚠️ WARNING: HF_TOKEN is missing! The app will use Local Offline Mode.");
+    }
 
     if (!inputText) {
       return res
@@ -33,192 +50,153 @@ const dynamicRouter = (app) => {
         .json({ error: "Please enter a description for your form." });
     }
 
+    const systemPrompt = `You are an API that generates JSON form schemas. You must respond ONLY with a valid JSON object containing a "title" and a "fields" array. Do not include any conversation, markdown formatting (\`\`\`json), or explanations. If the user asks in Khmer, the label and placeholder values MUST be translated into Khmer.
+
+    Format required:
+    {
+      "title": "Form Title Here",
+      "fields": [
+        { "id": 1, "label": "Full Name", "type": "text", "placeholder": "Enter your name" },
+        { "id": 2, "label": "Email", "type": "email", "placeholder": "example@email.com" }
+      ]
+    }`;
+
+    // Highly available fallback endpoints
+    const endpointsToTry = [
+        { 
+          url: "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-3B-Instruct/v1/chat/completions", 
+          model: "meta-llama/Llama-3.2-3B-Instruct",
+          type: "chat"
+        },
+        { 
+          url: "https://router.huggingface.co/hf-inference/models/Qwen/Qwen2.5-7B-Instruct/v1/chat/completions", 
+          model: "Qwen/Qwen2.5-7B-Instruct",
+          type: "chat"
+        }
+    ];
+
+    let responseData = null;
+    let generatedText = "";
+    let isFallback = false;
+
+    // 🌟 ONLY try Hugging Face if the token exists
+    if (process.env.HF_TOKEN) {
+      for (const endpoint of endpointsToTry) {
+          try {
+              console.log(`\n⏳ Requesting AI Generation...`);
+              console.log(`📍 Trying URL: ${endpoint.url}`);
+              
+              const response = await axios.post(
+                  endpoint.url,
+                  {
+                      model: endpoint.model,
+                      messages: [
+                          { role: "system", content: systemPrompt },
+                          { role: "user", content: inputText }
+                      ],
+                      max_tokens: 1024,
+                      temperature: 0.1,
+                  },
+                  {
+                      headers: {
+                          Authorization: `Bearer ${process.env.HF_TOKEN}`,
+                          "Content-Type": "application/json",
+                      },
+                      timeout: 10000 // 10 seconds before giving up
+                  }
+              );
+              
+              responseData = response.data;
+              if (responseData.choices && responseData.choices[0] && responseData.choices[0].message) {
+                  generatedText = responseData.choices[0].message.content;
+              }
+              console.log(`✅ Success! Form generated using ${endpoint.model}`);
+              break; 
+              
+          } catch (error) {
+              console.warn(`❌ Failed with ${endpoint.model}. Reason: ${error.response?.status} ${error.response?.statusText || error.message}`);
+              responseData = null; 
+              generatedText = "";
+          }
+      }
+    }
+
+    let generatedFields = [];
+    let formTitle = "Generated Form";
+
+    // 🌟 THE BULLETPROOF LOCAL FALLBACK
+    // If Hugging Face failed OR the AI returned garbage, we use your local templates!
+    if (!responseData || !generatedText) {
+        console.warn("\n⚡ ALL AI ATTEMPTS FAILED. Engaging Intelligent Local Fallback!");
+        isFallback = true;
+        
+        const inputLower = inputText.toLowerCase();
+
+        // Match the user's text to your formSchemas.js
+        if (inputLower.includes("អាពាហ៍ពិពាហ៍") || inputLower.includes("wedding")) {
+            generatedFields = formSchemas["អាពាហ៍ពិពាហ៍"];
+            formTitle = "ទម្រង់អាពាហ៍ពិពាហ៍";
+        } else if (inputLower.includes("ចុះឈ្មោះ") || inputLower.includes("register")) {
+            generatedFields = formSchemas["ចុះឈ្មោះសកម្មភាព"] || formSchemas.registration;
+            formTitle = "ទម្រង់ចុះឈ្មោះសកម្មភាព";
+        } else if (inputLower.includes("contact") || inputLower.includes("ទាក់ទង")) {
+            generatedFields = formSchemas.contact;
+            formTitle = "Contact Form";
+        } else {
+            // If they type something random, give them the general template
+            generatedFields = formSchemas.general;
+            formTitle = "General Form";
+        }
+    } else {
+        // Parse the AI's JSON if it succeeded
+        try {
+            let cleanJsonString = generatedText.trim();
+            if (cleanJsonString.startsWith("```json")) cleanJsonString = cleanJsonString.replace(/^```json/, "");
+            if (cleanJsonString.startsWith("```")) cleanJsonString = cleanJsonString.replace(/^```/, "");
+            if (cleanJsonString.endsWith("```")) cleanJsonString = cleanJsonString.replace(/```$/, "");
+            
+            const generatedData = JSON.parse(cleanJsonString.trim());
+            
+            if (Array.isArray(generatedData)) {
+                generatedFields = generatedData;
+            } else if (generatedData.fields) {
+                generatedFields = generatedData.fields;
+                formTitle = generatedData.title || formTitle;
+            }
+        } catch (error) {
+            console.warn("❌ AI JSON Parsing failed. Engaging Local Fallback!");
+            isFallback = true;
+            generatedFields = formSchemas.general;
+        }
+    }
+
+    // 🌟 GUARANTEED DATABASE SAVE
     try {
-      // 🌟 NEW: Switched to a Multilingual Zero-Shot Model that understands Khmer!
-      const response = await axios.post(
-        "https://router.huggingface.co/hf-inference/models/MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
-        {
-          inputs: inputText,
-          parameters: {
-            // Added Khmer categories alongside English ones
-            candidate_labels: [
-              "registration",
-              "contact",
-              "feedback",
-              "general",
-              "អាពាហ៍ពិពាហ៍", // Wedding
-              "ចុះឈ្មោះសកម្មភាព", // Activity Registration
-            ],
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.HF_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const publicHash = crypto.randomBytes(6).toString("hex");
+      const validCreatorId = creator_id || new mongoose.Types.ObjectId();
 
-      const responseData = response.data;
+      const newForm = new Form({
+        title: formTitle,
+        description: inputText,
+        creator_id: validCreatorId,
+        schema: generatedFields,
+        public_hash: publicHash
+      });
 
-      if (responseData && responseData.error) {
-        console.warn("Hugging Face API Warning:", responseData.error);
-        const errorMsg =
-          typeof responseData.error === "string"
-            ? responseData.error
-            : JSON.stringify(responseData.error);
-        return res.status(503).json({ error: `Hugging Face API: ${errorMsg}` });
-      }
-
-      let topCategory = "general";
-
-      // Parse the response
-      if (
-        Array.isArray(responseData) &&
-        responseData.length > 0 &&
-        responseData[0].label
-      ) {
-        topCategory = responseData[0].label;
-      } else if (
-        responseData &&
-        responseData.labels &&
-        Array.isArray(responseData.labels)
-      ) {
-        topCategory = responseData.labels[0];
-      } else if (
-        Array.isArray(responseData) &&
-        responseData[0] &&
-        responseData[0].labels
-      ) {
-        topCategory = responseData[0].labels[0];
-      } else {
-        console.error(
-          "Unexpected API Response format:",
-          JSON.stringify(response.data, null, 2),
-        );
-        return res.status(500).json({
-          error:
-            "Received an unexpected response format from Hugging Face API.",
-        });
-      }
-
-      // Friendly response (handles English or Khmer intent)
-      const predictedSentence = `I understand you need a [ ${topCategory} ] form. Here is a template for that!`;
-
-      // Define the form templates (Added Khmer templates)
-      const formSchemas = {
-        registration: [
-          { id: 1, label: "Full Name", type: "text", placeholder: "John Doe" },
-          {
-            id: 2,
-            label: "Email Address",
-            type: "email",
-            placeholder: "john@example.com",
-          },
-          {
-            id: 3,
-            label: "Password",
-            type: "password",
-            placeholder: "********",
-          },
-        ],
-        contact: [
-          { id: 1, label: "Name", type: "text", placeholder: "Your Name" },
-          { id: 2, label: "Email", type: "email", placeholder: "Your Email" },
-          {
-            id: 3,
-            label: "Message",
-            type: "text",
-            placeholder: "How can we help?",
-          },
-        ],
-        feedback: [
-          { id: 1, label: "Rating (1-5)", type: "number", placeholder: "5" },
-          {
-            id: 2,
-            label: "Suggestions",
-            type: "text",
-            placeholder: "Tell us more...",
-          },
-        ],
-        general: [
-          {
-            id: 1,
-            label: "Title",
-            type: "text",
-            placeholder: "Enter title here",
-          },
-          {
-            id: 2,
-            label: "Description",
-            type: "text",
-            placeholder: "Enter details...",
-          },
-        ],
-        // 🌟 NEW KHMER TEMPLATES:
-        អាពាហ៍ពិពាហ៍: [
-          {
-            id: 1,
-            label: "ឈ្មោះភ្ញៀវ",
-            type: "text",
-            placeholder: "បញ្ចូលឈ្មោះរបស់អ្នក...",
-          },
-          {
-            id: 2,
-            label: "លេខទូរស័ព្ទ",
-            type: "text",
-            placeholder: "០១២ ៣៤៥ ៦៧៨",
-          },
-          {
-            id: 3,
-            label: "ចំនួនអ្នកចូលរួម",
-            type: "number",
-            placeholder: "ឧទាហរណ៍៖ ២",
-          },
-          {
-            id: 4,
-            label: "ចំណងដៃ / សារជូនពរ",
-            type: "text",
-            placeholder: "សរសេរសាររបស់អ្នកនៅទីនេះ...",
-          },
-        ],
-        ចុះឈ្មោះសកម្មភាព: [
-          {
-            id: 1,
-            label: "ឈ្មោះពេញ",
-            type: "text",
-            placeholder: "បញ្ចូលឈ្មោះពេញ...",
-          },
-          { id: 2, label: "ភេទ", type: "text", placeholder: "ប្រុស / ស្រី" },
-          {
-            id: 3,
-            label: "លេខទូរស័ព្ទ",
-            type: "text",
-            placeholder: "០១២ ៣៤៥ ៦៧៨",
-          },
-          {
-            id: 4,
-            label: "អ៊ីមែល",
-            type: "email",
-            placeholder: "example@email.com",
-          },
-        ],
-      };
-
-      // Assign the generated fields based on the AI's category
-      let generatedFields = formSchemas[topCategory] || formSchemas.general;
+      await newForm.save();
 
       res.json({
-        prediction: predictedSentence,
+        prediction: isFallback 
+            ? `Offline Mode: Automatically loaded template for "${inputText}"` 
+            : `AI successfully generated a custom form based on: "${inputText}"`,
         fields: generatedFields,
+        form_id: newForm._id,
+        public_hash: publicHash
       });
+
     } catch (error) {
-      const hfError =
-        error.response?.data?.error || error.response?.data || error.message;
-      console.error("Hugging Face API Error:", hfError);
-      res.status(500).json({
-        error: typeof hfError === "string" ? hfError : JSON.stringify(hfError),
-      });
+      console.error("Database error:", error.message);
+      res.status(500).json({ error: "Internal Server Error during database save." });
     }
   });
 };

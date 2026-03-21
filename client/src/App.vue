@@ -1,7 +1,8 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <HelloWorld />
+  <div class="animate-fade-up animate-once animate-duration-500 animate-delay-300 animate-ease-out">
+    <router-view></router-view>
+  </div>
 </template>
