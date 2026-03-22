@@ -4,16 +4,17 @@ const express = require("express");
 const axios = require("axios");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
-const Form = require("./models/forms"); // Adjust path if your model is elsewhere
-const formSchemas = require("./formSchemas"); // 🌟 Imported your predefined schemas!
+const Form = require("./models/forms");
+const User = require("./models/users"); // 🌟 NEW: Import your User model!
+const matchTemplate = require("./utils/templateMatcher"); // 🌟 Import our fallback utility!
+const buildSystemPrompt = require("./utils/systemPrompt"); // 🌟 Import the dynamic prompt builder!
 
 const dynamicRouter = (app) => {
   const routesDir = path.join(__dirname, "routes");
 
-  // --- ADDED DEBUG LOGS HERE ---
   if (fs.existsSync(routesDir)) {
     console.log(`\n📁 Scanning for route files in: ${routesDir}`);
-    
+
     fs.readdirSync(routesDir).forEach((file) => {
       const routePath = path.join(routesDir, file);
 
@@ -21,27 +22,49 @@ const dynamicRouter = (app) => {
         const routeName = file.replace(".js", "");
         const route = require(routePath);
 
-        // Express Routers evaluate as functions
         if (typeof route === "function") {
           app.use(`/api/${routeName}`, route);
           console.log(`  ✅ Successfully registered route: /api/${routeName}`);
         } else {
-          console.warn(`  ⚠️ Skipping file: ${file} (It does not export a valid Express Router. Did you forget 'module.exports = router;'?)`);
+          console.warn(`  ⚠️ Skipping file: ${file}`);
         }
       }
     });
-    console.log(""); // Empty line for spacing
+    console.log("");
   } else {
-    console.error(`\n❌ ERROR: Routes folder not found at ${routesDir}. Please create a 'routes' folder next to your server.js file!\n`);
+    console.error(`\n❌ ERROR: Routes folder not found at ${routesDir}.\n`);
   }
-  // ------------------------------
 
   app.post("/predict", async (req, res) => {
-    const { inputText, creator_id } = req.body; // Added creator_id
+    const { inputText, creator_id } = req.body;
 
-    // 🌟 1. Check if the Hugging Face Token is actually loaded
+    // 🌟 NEW: 1. Validate User and Check Tokens BEFORE asking the AI
+    let user = null;
+    if (creator_id) {
+      try {
+        user = await User.findById(creator_id);
+        if (!user) {
+          return res
+            .status(404)
+            .json({ error: "User not found in the database." });
+        }
+
+        // Check if the user has used up all their tokens
+        if (user.tokens_used >= user.form_token) {
+          return res.status(403).json({
+            error:
+              "Token limit reached. You have used all 5 of your tokens! Please upgrade to generate more.",
+          });
+        }
+      } catch (err) {
+        return res.status(400).json({ error: "Invalid user ID format." });
+      }
+    }
+
     if (!process.env.HF_TOKEN) {
-      console.warn("⚠️ WARNING: HF_TOKEN is missing! The app will use Local Offline Mode.");
+      console.warn(
+        "⚠️ WARNING: HF_TOKEN is missing! The app will use Local Offline Mode.",
+      );
     }
 
     if (!inputText) {
@@ -50,124 +73,134 @@ const dynamicRouter = (app) => {
         .json({ error: "Please enter a description for your form." });
     }
 
-    const systemPrompt = `You are an API that generates JSON form schemas. You must respond ONLY with a valid JSON object containing a "title" and a "fields" array. Do not include any conversation, markdown formatting (\`\`\`json), or explanations. If the user asks in Khmer, the label and placeholder values MUST be translated into Khmer.
+    // 🌟 Call the function from your utility file!
+    const systemPrompt = buildSystemPrompt();
 
-    Format required:
-    {
-      "title": "Form Title Here",
-      "fields": [
-        { "id": 1, "label": "Full Name", "type": "text", "placeholder": "Enter your name" },
-        { "id": 2, "label": "Email", "type": "email", "placeholder": "example@email.com" }
-      ]
-    }`;
-
-    // Highly available fallback endpoints
+    // 🌟 COMPLETELY FREE & OPEN MODELS FOR TESTING
     const endpointsToTry = [
-        { 
-          url: "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-3B-Instruct/v1/chat/completions", 
-          model: "meta-llama/Llama-3.2-3B-Instruct",
-          type: "chat"
-        },
-        { 
-          url: "https://router.huggingface.co/hf-inference/models/Qwen/Qwen2.5-7B-Instruct/v1/chat/completions", 
-          model: "Qwen/Qwen2.5-7B-Instruct",
-          type: "chat"
-        }
+      {
+        url: "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions",
+        model: "mistralai/Mistral-7B-Instruct-v0.3",
+        type: "chat",
+      },
+      {
+        url: "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions",
+        model: "HuggingFaceH4/zephyr-7b-beta",
+        type: "chat",
+      },
     ];
 
     let responseData = null;
     let generatedText = "";
     let isFallback = false;
 
-    // 🌟 ONLY try Hugging Face if the token exists
     if (process.env.HF_TOKEN) {
       for (const endpoint of endpointsToTry) {
-          try {
-              console.log(`\n⏳ Requesting AI Generation...`);
-              console.log(`📍 Trying URL: ${endpoint.url}`);
-              
-              const response = await axios.post(
-                  endpoint.url,
-                  {
-                      model: endpoint.model,
-                      messages: [
-                          { role: "system", content: systemPrompt },
-                          { role: "user", content: inputText }
-                      ],
-                      max_tokens: 1024,
-                      temperature: 0.1,
-                  },
-                  {
-                      headers: {
-                          Authorization: `Bearer ${process.env.HF_TOKEN}`,
-                          "Content-Type": "application/json",
-                      },
-                      timeout: 10000 // 10 seconds before giving up
-                  }
-              );
-              
-              responseData = response.data;
-              if (responseData.choices && responseData.choices[0] && responseData.choices[0].message) {
-                  generatedText = responseData.choices[0].message.content;
-              }
-              console.log(`✅ Success! Form generated using ${endpoint.model}`);
-              break; 
-              
-          } catch (error) {
-              console.warn(`❌ Failed with ${endpoint.model}. Reason: ${error.response?.status} ${error.response?.statusText || error.message}`);
-              responseData = null; 
-              generatedText = "";
+        try {
+          console.log(`\n⏳ Requesting AI Generation...`);
+          console.log(`📍 Trying URL: ${endpoint.url}`);
+
+          const response = await axios.post(
+            endpoint.url,
+            {
+              model: endpoint.model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: inputText },
+              ],
+              max_tokens: 1024,
+              temperature: 0.1,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.HF_TOKEN}`,
+                "Content-Type": "application/json",
+              },
+              timeout: 15000, // Give it 15 seconds for the free tier
+            },
+          );
+
+          responseData = response.data;
+          if (
+            responseData.choices &&
+            responseData.choices[0] &&
+            responseData.choices[0].message
+          ) {
+            generatedText = responseData.choices[0].message.content;
           }
+          console.log(`✅ Success! Form generated using ${endpoint.model}`);
+          break;
+        } catch (error) {
+          const status = error.response?.status;
+          console.warn(
+            `❌ Failed with ${endpoint.model}. Reason: ${status} ${error.response?.statusText || error.message}`,
+          );
+
+          // 🌟 403 DIAGNOSTIC WARNING: Exactly how to fix the Token Permissions!
+          if (status === 403) {
+            console.warn(`\n🛑 403 FORBIDDEN ERROR DETECTED:`);
+            console.warn(
+              `Your Hugging Face token is valid, but it DOES NOT have permission to use the Inference API.`,
+            );
+            console.warn(`To fix this:`);
+            console.warn(`1. Go to https://huggingface.co/settings/tokens`);
+            console.warn(
+              `2. Click 'Edit' next to your token (or click 'Create new token' -> 'Fine-grained')`,
+            );
+            console.warn(
+              `3. Scroll down to "Inference" and CHECK the box for "Make calls to the serverless Inference API"`,
+            );
+            console.warn(
+              `4. Save it, update your .env file if it's a new token, and restart this Node server.\n`,
+            );
+          }
+
+          responseData = null;
+          generatedText = "";
+        }
       }
     }
 
     let generatedFields = [];
     let formTitle = "Generated Form";
 
-    // 🌟 THE BULLETPROOF LOCAL FALLBACK
-    // If Hugging Face failed OR the AI returned garbage, we use your local templates!
+    // 🌟 LOCAL FALLBACK
     if (!responseData || !generatedText) {
-        console.warn("\n⚡ ALL AI ATTEMPTS FAILED. Engaging Intelligent Local Fallback!");
-        isFallback = true;
-        
-        const inputLower = inputText.toLowerCase();
+      console.warn(
+        "\n⚡ ALL AI ATTEMPTS FAILED. Engaging Intelligent Local Fallback!",
+      );
+      isFallback = true;
 
-        // Match the user's text to your formSchemas.js
-        if (inputLower.includes("អាពាហ៍ពិពាហ៍") || inputLower.includes("wedding")) {
-            generatedFields = formSchemas["អាពាហ៍ពិពាហ៍"];
-            formTitle = "ទម្រង់អាពាហ៍ពិពាហ៍";
-        } else if (inputLower.includes("ចុះឈ្មោះ") || inputLower.includes("register")) {
-            generatedFields = formSchemas["ចុះឈ្មោះសកម្មភាព"] || formSchemas.registration;
-            formTitle = "ទម្រង់ចុះឈ្មោះសកម្មភាព";
-        } else if (inputLower.includes("contact") || inputLower.includes("ទាក់ទង")) {
-            generatedFields = formSchemas.contact;
-            formTitle = "Contact Form";
-        } else {
-            // If they type something random, give them the general template
-            generatedFields = formSchemas.general;
-            formTitle = "General Form";
-        }
+      // Use our utility function to keep the router clean!
+      const matchedData = matchTemplate(inputText);
+      generatedFields = matchedData.fields;
+      formTitle = matchedData.title;
     } else {
-        // Parse the AI's JSON if it succeeded
-        try {
-            let cleanJsonString = generatedText.trim();
-            if (cleanJsonString.startsWith("```json")) cleanJsonString = cleanJsonString.replace(/^```json/, "");
-            if (cleanJsonString.startsWith("```")) cleanJsonString = cleanJsonString.replace(/^```/, "");
-            if (cleanJsonString.endsWith("```")) cleanJsonString = cleanJsonString.replace(/```$/, "");
-            
-            const generatedData = JSON.parse(cleanJsonString.trim());
-            
-            if (Array.isArray(generatedData)) {
-                generatedFields = generatedData;
-            } else if (generatedData.fields) {
-                generatedFields = generatedData.fields;
-                formTitle = generatedData.title || formTitle;
-            }
-        } catch (error) {
-            console.warn("❌ AI JSON Parsing failed. Engaging Local Fallback!");
-            isFallback = true;
-            generatedFields = formSchemas.general;
+      try {
+        let cleanJsonString = generatedText.trim();
+        if (cleanJsonString.startsWith("```json"))
+          cleanJsonString = cleanJsonString.replace(/^```json/, "");
+        if (cleanJsonString.startsWith("```"))
+          cleanJsonString = cleanJsonString.replace(/^```/, "");
+        if (cleanJsonString.endsWith("```"))
+          cleanJsonString = cleanJsonString.replace(/```$/, "");
+
+        const generatedData = JSON.parse(cleanJsonString.trim());
+
+        if (Array.isArray(generatedData)) {
+          generatedFields = generatedData;
+        } else if (generatedData.fields) {
+          generatedFields = generatedData.fields;
+          formTitle = generatedData.title || formTitle;
         }
+      } catch (error) {
+        console.warn("❌ AI JSON Parsing failed. Engaging Local Fallback!");
+        isFallback = true;
+
+        const matchedData = matchTemplate(inputText);
+        generatedFields = matchedData.fields;
+        formTitle = matchedData.title;
+      }
     }
 
     // 🌟 GUARANTEED DATABASE SAVE
@@ -180,23 +213,66 @@ const dynamicRouter = (app) => {
         description: inputText,
         creator_id: validCreatorId,
         schema: generatedFields,
-        public_hash: publicHash
+        public_hash: publicHash,
       });
 
       await newForm.save();
 
+      // 🌟 NEW: 2. Deduct Token and Link Form to User
+      if (user) {
+        user.tokens_used += 1; // Consume 1 token
+        user.form_ids.push(newForm._id); // Save the form ID to the user's profile
+        await user.save();
+        console.log(
+          `✅ Token used! User now has ${user.form_token - user.tokens_used} tokens remaining.`,
+        );
+      }
+
       res.json({
-        prediction: isFallback 
-            ? `Offline Mode: Automatically loaded template for "${inputText}"` 
-            : `AI successfully generated a custom form based on: "${inputText}"`,
+        prediction: isFallback
+          ? `Offline Mode: Automatically loaded template for "${inputText}"`
+          : `AI successfully generated a custom form based on: "${inputText}"`,
         fields: generatedFields,
         form_id: newForm._id,
-        public_hash: publicHash
+        public_hash: publicHash,
       });
-
     } catch (error) {
       console.error("Database error:", error.message);
-      res.status(500).json({ error: "Internal Server Error during database save." });
+      res
+        .status(500)
+        .json({ error: "Internal Server Error during database save." });
+    }
+  });
+
+  // GET route
+  app.get("/api/forms/:id", async (req, res) => {
+    try {
+      const form = await Form.findById(req.params.id);
+      if (!form) return res.status(404).json({ error: "Form not found" });
+      res.json(form);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Internal Server Error. Invalid ID format." });
+    }
+  });
+
+  // PUT route
+  app.put("/api/forms/:id", async (req, res) => {
+    try {
+      const { title, description, schema } = req.body;
+      const updatedForm = await Form.findByIdAndUpdate(
+        req.params.id,
+        { title, description, schema, updated_at: Date.now() },
+        { new: true },
+      );
+      if (!updatedForm)
+        return res.status(404).json({ error: "Form not found" });
+      res.json({ message: "Form updated successfully!", form: updatedForm });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Internal Server Error. Failed to update." });
     }
   });
 };

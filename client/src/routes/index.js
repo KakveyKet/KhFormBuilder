@@ -2,7 +2,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../pages/HomeView.vue";
 import EditForm from "../pages/EditForm.vue";
-
+import FormGenerator from "../pages/FormGenerator.vue";
+import Profile from "../pages/Profile.vue";
+import Workspace from "../pages/Workspace.vue";
+// auth
+import Register from "../pages/Register.vue";
+import Login from "../pages/Login.vue";
 const routes = [
   {
     path: "/",
@@ -13,13 +18,33 @@ const routes = [
     path: "/edit/:id",
     name: "edit",
     component: EditForm,
-  }
-//   {
-//     path: "/navbar",
-//     name: "navbar",
-//     component: () => import("../pages/Navbar.vue"),
-//   }
-]; 
+  },
+  {
+    path: "/generate",
+    name: "generate",
+    component: FormGenerator,
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: Register,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: Login,
+  },
+  {
+    path: "/profile",
+    name: "profile",
+    component: Profile,
+  },
+  {
+    path: "/workspace",
+    name: "workspace",
+    component: Workspace,
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

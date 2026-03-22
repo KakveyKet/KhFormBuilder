@@ -16,6 +16,67 @@ body {
 }
 
 @layer components {
+  /* --- NAVIGATION SECTION --- */
+  .nav-header {
+    @apply w-full bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-theme-border/60 transition-all duration-300 relative;
+  }
+
+  .nav-wrapper {
+    @apply w-full max-w-[90%] xl:max-w-[1200px] mx-auto flex items-center justify-between py-4;
+  }
+
+  .nav-logo-link {
+    /* REMOVED 'group' from here as it must be in the HTML/Vue template instead */
+    @apply flex items-center gap-2;
+  }
+
+  .nav-logo-svg {
+    @apply group-hover:scale-105 transition-transform;
+  }
+
+  .nav-logo-text {
+    @apply text-[20px] font-bold text-[#0F172A] tracking-tight group-hover:text-[#5855F6] transition-colors;
+  }
+
+  .nav-desktop-menu {
+    @apply hidden md:flex items-center space-x-8;
+  }
+
+  .nav-link {
+    @apply text-[15px] font-medium text-[#475569] hover:text-[#5855F6] transition-colors;
+  }
+
+  .nav-actions {
+    @apply flex items-center gap-4;
+  }
+
+  .nav-login-link {
+    @apply hidden md:block text-[15px] font-medium text-[#475569] hover:text-[#5855F6] transition-colors mr-2;
+  }
+
+  .btn-nav-primary {
+    @apply hidden md:block bg-[#5855F6] text-white font-medium text-[15px] px-6 py-2.5 rounded-md hover:bg-[#4338CA] transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .nav-mobile-toggle {
+    @apply md:hidden p-2 text-[#475569] hover:text-[#0F172A] focus:outline-none transition-colors;
+  }
+
+  .nav-mobile-menu {
+    @apply md:hidden absolute top-full left-0 w-full bg-white border-b border-theme-border/60 shadow-xl flex flex-col px-6 py-5 gap-4 z-40;
+  }
+
+  .nav-mobile-link {
+    @apply text-[16px] font-medium text-[#475569] hover:text-[#5855F6] transition-colors;
+  }
+
+  .nav-mobile-divider {
+    @apply border-[#F1F5F9] my-2;
+  }
+
+  .btn-mobile-nav-primary {
+    @apply w-full bg-[#5855F6] text-white font-medium text-[16px] px-6 py-3 rounded-md hover:bg-[#4338CA] transition-all shadow-sm;
+  }
   /* --- HERO SECTION --- */
   .hero-container {
     @apply w-full min-h-screen lg:min-h-[850px] py-20 px-5 bg-[#f0f4ff] flex items-center overflow-hidden;
@@ -46,8 +107,10 @@ body {
   /* Applied the Typewriter effect to the highlight text */
   .hero-title-highlight {
     @apply text-theme-primary italic inline-block overflow-hidden whitespace-nowrap align-bottom pr-1;
-    border-right: 4px solid #5855F6;
-    animation: typing-delete 5s steps(10, end) infinite, blink-cursor 0.75s step-end infinite;
+    border-right: 4px solid #5855f6;
+    animation:
+      typing-delete 5s steps(10, end) infinite,
+      blink-cursor 0.75s step-end infinite;
   }
 
   .hero-description {
@@ -82,7 +145,6 @@ body {
   .hero-image {
     @apply w-full max-w-[350px] md:max-w-[450px] lg:max-w-[600px] h-auto object-contain drop-shadow-2xl;
   }
-
 
   /* --- FEATURES SECTION --- */
   .features-section {
@@ -119,10 +181,10 @@ body {
   .feature-icon-wrapper {
     @apply w-14 h-14 lg:w-16 lg:h-16 rounded-2xl flex items-center justify-center mb-6 lg:mb-8 shadow-sm transition-transform duration-300;
   }
-  
+
   /* Icon scales up when the parent card is hovered */
   .feature-card:hover .feature-icon-wrapper {
-      @apply scale-110 -rotate-3;
+    @apply scale-110 -rotate-3;
   }
 
   .feature-icon {
@@ -138,15 +200,26 @@ body {
   }
 
   /* Unique Card Theme Colors */
-  .card-blue { @apply bg-[#F4F6FF]; }
-  .icon-blue { @apply bg-[#5855F6]; }
+  .card-blue {
+    @apply bg-[#F4F6FF];
+  }
+  .icon-blue {
+    @apply bg-[#5855F6];
+  }
 
-  .card-pink { @apply bg-[#FFF0F6]; }
-  .icon-pink { @apply bg-[#F0428A]; }
+  .card-pink {
+    @apply bg-[#FFF0F6];
+  }
+  .icon-pink {
+    @apply bg-[#F0428A];
+  }
 
-  .card-yellow { @apply bg-[#FEFBEA]; }
-  .icon-yellow { @apply bg-[#F4BA00]; }
-
+  .card-yellow {
+    @apply bg-[#FEFBEA];
+  }
+  .icon-yellow {
+    @apply bg-[#F4BA00];
+  }
 
   /* --- PRICING SECTION --- */
   .pricing-section {
@@ -239,7 +312,6 @@ body {
     @apply w-full bg-[#5855F6] text-white py-4 rounded-xl font-bold text-[16px] transition-all duration-300 mt-auto
     hover:bg-[#4338CA] shadow-md hover:shadow-lg hover:shadow-[#5855F6]/30 hover:-translate-y-1 hover:scale-[1.02];
   }
-
 
   /* --- CTA SECTION --- */
   .cta-section {
@@ -348,16 +420,434 @@ body {
     @apply w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-[#94A3B8] transition-all duration-300 cursor-pointer
     hover:bg-[#5855F6] hover:text-white hover:scale-110 hover:-translate-y-1 hover:shadow-md hover:shadow-[#5855F6]/30;
   }
+
+  /* --- Append this to your existing @layer components in styles.css --- */
+
+  /* --- PROFILE SECTION --- */
+  .profile-page-wrapper {
+    @apply min-h-screen bg-gray-50/50 py-16 px-4 font-sans;
+  }
+
+  .profile-container {
+    @apply max-w-2xl mx-auto space-y-8 animate-fade-up animate-once animate-duration-500;
+  }
+
+  .profile-header-group {
+    @apply space-y-1 mb-8;
+  }
+
+  .profile-title {
+    @apply text-3xl font-bold text-gray-900 tracking-tight;
+  }
+
+  .profile-subtitle {
+    @apply text-gray-500 text-[15px];
+  }
+
+  .profile-card {
+    @apply bg-white border border-gray-200 rounded-[24px] shadow-sm overflow-hidden;
+  }
+
+  .profile-user-section {
+    @apply p-8 border-b border-gray-100 flex items-center gap-6;
+  }
+
+  .profile-avatar {
+    @apply w-20 h-20 rounded-2xl bg-[#5855F6] flex items-center justify-center text-white text-3xl font-bold uppercase shadow-lg shadow-[#5855F6]/20;
+  }
+
+  .profile-user-details {
+    @apply space-y-1;
+  }
+
+  .profile-user-email {
+    @apply text-2xl font-bold text-gray-900 tracking-tight;
+  }
+
+  .profile-badge-row {
+    @apply flex items-center gap-3;
+  }
+
+  .profile-badge-active {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wide;
+  }
+
+  .profile-id-text {
+    @apply text-xs font-mono text-gray-400;
+  }
+
+  .profile-token-section {
+    @apply p-8 bg-gray-50/30;
+  }
+
+  .profile-token-header {
+    @apply flex items-center justify-between mb-5;
+  }
+
+  .profile-token-title {
+    @apply text-lg font-bold text-gray-800;
+  }
+
+  .profile-token-count {
+    @apply text-sm font-bold text-[#5855F6] bg-[#5855F6]/10 px-3 py-1 rounded-lg;
+  }
+
+  .profile-progress-bg {
+    @apply w-full bg-gray-200 rounded-full h-2.5 mb-3 overflow-hidden;
+  }
+
+  .profile-progress-fill {
+    @apply bg-gradient-to-r from-[#5855F6] to-[#F0428A] h-2.5 rounded-full transition-all duration-1000 ease-out shadow-sm;
+  }
+
+  .profile-stats-row {
+    @apply flex justify-between;
+  }
+
+  .profile-stat-text {
+    @apply text-[13px] font-medium text-gray-500 uppercase tracking-tighter;
+  }
+
+  .profile-alert-box {
+    @apply mt-8 p-5 bg-white border border-orange-200 rounded-2xl flex items-start gap-4 shadow-sm;
+  }
+
+  .profile-alert-icon {
+    @apply text-orange-500 mt-0.5;
+  }
+
+  .profile-alert-title {
+    @apply text-[14px] font-bold text-gray-900;
+  }
+
+  .profile-alert-desc {
+    @apply text-[13px] text-gray-500 mt-0.5 leading-relaxed;
+  }
+
+  .btn-upgrade-inline {
+    @apply mt-3 px-4 py-1.5 bg-[#5855F6] text-white text-xs font-bold rounded-lg hover:bg-[#4338CA] transition-all;
+  }
+
+  .profile-footer {
+    @apply p-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4;
+  }
+
+  .btn-text-link {
+    @apply text-[#5855F6] text-sm font-bold hover:text-[#4338CA] transition-colors;
+  }
+
+  .btn-outline-danger {
+    @apply w-full sm:w-auto px-6 py-2.5 border-2 border-red-50 text-red-600 font-bold text-sm rounded-xl hover:bg-red-600 hover:text-white transition-all duration-300;
+  }
+
+  .profile-loading {
+    @apply text-center py-20 flex flex-col items-center gap-4 text-gray-400 font-medium;
+  }
+
+  .profile-spinner {
+    @apply w-10 h-10 border-4 border-gray-200 border-t-[#5855F6] rounded-full animate-spin;
+  }
+
+  /* --- WORKSPACE LAYOUT --- */
+  .ws-layout {
+    @apply flex h-screen bg-white font-sans overflow-hidden text-[#202124];
+  }
+
+  /* SIDEBAR */
+  .ws-sidebar {
+    @apply w-[280px] flex flex-col flex-shrink-0 bg-white border-r border-gray-100 py-6;
+  }
+
+  .ws-sidebar-logo {
+    @apply px-6 h-12 flex items-center mb-2;
+  }
+
+  .ws-logo-link {
+    @apply flex items-center gap-2;
+  }
+
+  .ws-logo-text {
+    @apply font-bold text-xl tracking-tight text-[#0F172A];
+  }
+
+  .btn-ws-create {
+    @apply flex items-center gap-3 px-5 py-3.5 bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-300 font-bold text-sm text-gray-700 w-fit;
+  }
+
+  .ws-sidebar-nav {
+    @apply flex-1 px-3 space-y-1;
+  }
+
+  .ws-nav-link {
+    @apply flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100;
+  }
+
+  .ws-nav-link.active {
+    @apply bg-indigo-50 text-[#5855F6] font-bold;
+  }
+
+  .ws-sidebar-footer {
+    @apply px-4 py-6 border-t border-gray-50;
+  }
+
+  .ws-plan-card {
+    @apply p-4 bg-gray-50 rounded-2xl;
+  }
+
+  /* MAIN AREA */
+  .ws-main {
+    @apply flex-1 flex flex-col h-screen overflow-hidden bg-white;
+  }
+
+  .ws-top-nav {
+    @apply h-16 flex items-center justify-between px-6 flex-shrink-0;
+  }
+
+  .ws-search-container {
+    @apply flex-1 max-w-2xl flex justify-center;
+  }
+
+  .ws-search-wrapper {
+    @apply w-full max-w-xl flex items-center gap-3 px-4 py-2.5 bg-[#f1f3f4] rounded-lg focus-within:bg-white focus-within:shadow-md transition-all;
+  }
+
+  .ws-search-input {
+    @apply w-full bg-transparent border-none text-sm outline-none placeholder-gray-500;
+  }
+
+  .ws-top-actions {
+    @apply flex items-center gap-3;
+  }
+
+  .ws-icon-btn {
+    @apply p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors;
+  }
+
+  .ws-user-avatar {
+    @apply w-9 h-9 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center font-bold text-sm border border-amber-300 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500 transition-all;
+  }
+
+  /* CONTENT AREA */
+  .ws-content {
+    @apply flex-1 overflow-y-auto px-10 py-8;
+  }
+
+  .ws-section-header {
+    @apply flex items-center justify-between mb-2;
+  }
+
+  .ws-section-title {
+    @apply text-lg font-bold text-gray-900;
+  }
+
+  .ws-section-subtitle {
+    @apply text-sm text-gray-500;
+  }
+
+  .ws-filter-btn {
+    @apply flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200;
+  }
+
+  .ws-quick-stats {
+    @apply flex gap-6 mb-8 py-3 border-b border-gray-50;
+  }
+
+  .ws-quick-stat-item {
+    @apply text-xs font-medium uppercase tracking-wider;
+  }
+
+  /* GRID & CARDS */
+  .ws-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20;
+  }
+
+  .ws-card {
+    @apply bg-white border border-gray-200 rounded-xl overflow-hidden transition-all hover:shadow-lg cursor-default;
+  }
+
+  .ws-card-preview {
+    @apply h-36 flex items-center justify-center relative;
+  }
+
+  .ws-card-badge {
+    @apply absolute top-3 right-3 px-2 py-0.5 bg-white/60 backdrop-blur-sm rounded text-[10px] font-bold text-gray-600 uppercase tracking-tighter;
+  }
+
+  .ws-card-info {
+    @apply p-4 border-t border-gray-50;
+  }
+
+  .ws-card-type-icon {
+    @apply w-6 h-6 bg-[#5855F6] rounded flex items-center justify-center flex-shrink-0;
+  }
+
+  .ws-card-title {
+    @apply text-sm font-bold text-gray-900 truncate;
+  }
+
+  .ws-card-action-btn {
+    @apply p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors;
+  }
+
+  .ws-card-meta {
+    @apply mt-2 text-[11px] text-gray-400 font-medium;
+  }
+
+  /* STATES */
+  .ws-loader-container {
+    @apply flex justify-center py-20;
+  }
+
+  .ws-spinner {
+    @apply w-10 h-10 border-4 border-gray-100 border-t-[#5855F6] rounded-full animate-spin;
+  }
+
+  .ws-empty-state {
+    @apply py-20 text-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-3xl;
+  }
+
+  .ws-empty-icon {
+    @apply text-4xl mb-4;
+  }
+
+  /* --- STUDIO / EDITOR LAYOUT --- */
+  .studio-layout {
+    @apply flex flex-col h-screen bg-[#F8FAFF] font-sans overflow-hidden;
+  }
+
+  .studio-top-bar {
+    @apply h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0 z-30;
+  }
+
+  .studio-main {
+    @apply flex flex-1 overflow-hidden;
+  }
+
+  .studio-sidebar {
+    @apply w-[320px] bg-white border-r border-gray-200 flex flex-col overflow-y-auto p-6 space-y-8 flex-shrink-0 hidden lg:flex;
+  }
+
+  .studio-canvas {
+    @apply flex-1 overflow-y-auto p-12 bg-gray-50 flex justify-center;
+  }
+
+  .studio-paper {
+    @apply w-full max-w-[800px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-10 min-h-fit mb-20;
+  }
+
+  .studio-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-wider mb-6;
+  }
+
+  .studio-title-input {
+    @apply text-3xl font-bold text-gray-900 w-full bg-transparent border-none outline-none placeholder-gray-300 mb-2;
+  }
+
+  .studio-desc-input {
+    @apply text-gray-500 w-full bg-transparent border-none outline-none placeholder-gray-300 text-lg;
+  }
+
+  .studio-field-list {
+    @apply mt-12 space-y-6;
+  }
+
+  .studio-field-item {
+    @apply relative p-6 pl-10 bg-white border-2 border-transparent rounded-xl transition-all hover:border-indigo-100 hover:bg-gray-50/50 cursor-default;
+  }
+
+  .studio-field-item.active {
+    @apply border-indigo-500 bg-white shadow-lg shadow-indigo-500/10;
+  }
+
+  /* Drag Handle Styling */
+  .studio-drag-handle {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 p-1 text-gray-300 cursor-grab active:cursor-grabbing hover:text-gray-500 transition-colors;
+  }
+
+  /* SortableJS / Drag Classes */
+  .studio-field-item.dragging {
+    @apply opacity-50 scale-[0.98] border-indigo-500 rotate-1 shadow-2xl z-50;
+  }
+
+  .studio-field-item.ghost {
+    @apply bg-indigo-50 border-2 border-dashed border-indigo-200 opacity-100;
+  }
+
+  .studio-field-item.ghost * {
+    @apply opacity-0;
+  }
+
+  .studio-label-input {
+    @apply block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide;
+  }
+
+  .studio-input-mock {
+    @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-400 text-sm italic pointer-events-none transition-colors;
+  }
+
+  .studio-field-actions {
+    @apply absolute -right-12 top-0 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity;
+  }
+
+  .btn-studio-action {
+    @apply p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-100 hover:shadow-md transition-all;
+  }
+
+  .btn-studio-save {
+    @apply flex items-center gap-2 px-5 py-2 bg-[#5855F6] text-white rounded-lg font-bold text-sm hover:bg-[#4338CA] transition-all shadow-md active:scale-95;
+  }
+
+  .studio-back-link {
+    @apply flex items-center gap-2 text-gray-500 hover:text-gray-900 font-medium text-sm transition-colors;
+  }
+
+  .studio-add-field-zone {
+    @apply mt-10 flex justify-center;
+  }
+
+  .btn-studio-add {
+    @apply flex items-center gap-2 px-6 py-3 border-2 border-dashed border-gray-200 text-gray-400 rounded-xl hover:border-[#5855F6] hover:text-[#5855F6] transition-all font-bold text-sm w-full justify-center;
+  }
+
+  .studio-prop-group {
+    @apply space-y-4;
+  }
+
+  .studio-prop-label {
+    @apply block text-xs font-bold text-gray-400 uppercase mb-1;
+  }
+
+  .studio-prop-input {
+    @apply w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all;
+  }
+
+  .studio-prop-select {
+    @apply w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none appearance-none;
+  }
 }
 
 /* --- CUSTOM KEYFRAMES FOR TYPEWRITER EFFECT --- */
 @keyframes typing-delete {
-  0%, 15% { max-width: 0; }         /* Start empty, pause slightly */
-  40%, 60% { max-width: 100%; }     /* Type out completely and pause to let user read */
-  85%, 100% { max-width: 0; }       /* Delete completely and loop */
+  0%,
+  15% {
+    max-width: 0;
+  } /* Start empty, pause slightly */
+  40%,
+  60% {
+    max-width: 100%;
+  } /* Type out completely and pause to let user read */
+  85%,
+  100% {
+    max-width: 0;
+  } /* Delete completely and loop */
 }
 
 @keyframes blink-cursor {
-  from, to { border-right-color: transparent; }
-  50% { border-right-color: #5855F6; } /* Matches text-theme-primary */
+  from,
+  to {
+    border-right-color: transparent;
+  }
+  50% {
+    border-right-color: #5855f6;
+  } /* Matches text-theme-primary */
 }

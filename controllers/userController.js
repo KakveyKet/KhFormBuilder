@@ -7,7 +7,7 @@ exports.createUser = async (req, res) => {
     const { email, password, plan_id, stripe_customer_id, role, form_ids } =
       req.body;
 
-    // 1. Basic validation - ONLY email and password are required now
+    // 1. Basic validation
     if (!email || !password) {
       return res.status(400).json({
         error: "Email and password are required.",
@@ -25,27 +25,29 @@ exports.createUser = async (req, res) => {
     const password_hash = await bcrypt.hash(password, salt);
 
     // 4. Create and save the new user
+    // 🌟 STEP 1 OF THE PROCESS: GIVE THE USER 5 TOKENS UPON REGISTRATION!
     const newUser = new User({
       email,
       password_hash,
-      plan_id: plan_id || null, // Now optional
-      stripe_customer_id: stripe_customer_id || null, // Now optional
-      form_ids: form_ids || [], // Default to an empty array
-      role: role || "user", // defaults to "user" if not provided
+      plan_id: plan_id || null,
+      stripe_customer_id: stripe_customer_id || null,
+      form_ids: form_ids || [],
+      role: role || "user",
+      form_token: 5, // Welcome gift: 5 tokens allowed
+      tokens_used: 0, // They have used 0 so far
     });
 
     const savedUser = await newUser.save();
 
-    // 5. Return success (excluding the password hash from the response)
+    // 5. Return success
     res.status(201).json({
-      message: "User registered successfully!",
+      message: "User registered successfully! You have received 5 free tokens.",
       user: {
         _id: savedUser._id,
         email: savedUser.email,
         role: savedUser.role,
-        plan_id: savedUser.plan_id,
-        stripe_customer_id: savedUser.stripe_customer_id,
-        form_ids: savedUser.form_ids,
+        form_token: savedUser.form_token,
+        tokens_used: savedUser.tokens_used, // Return this so the frontend knows their balance!
         created_at: savedUser.created_at,
       },
     });
@@ -54,8 +56,6 @@ exports.createUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// --- PLACEHOLDERS FOR OTHER ROUTES TO PREVENT CRASHES ---
 
 exports.getUsers = async (req, res) => {
   try {
@@ -66,12 +66,63 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+// 🌟 NEW: Fetch a single user by their ID
 exports.getUserById = async (req, res) => {
-  res.status(200).json({ message: "Get user by ID - Not yet implemented" });
+  try {
+    const user = await User.findById(req.params.id).select("-password_hash");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Get User Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 exports.updateUser = async (req, res) => {
-  res.status(200).json({ message: "Update user - Not yet implemented" });
+  try {
+    const userId = req.params.id;
+    const {
+      email,
+      password,
+      plan_id,
+      stripe_customer_id,
+      role,
+      form_ids,
+      form_token,
+    } = req.body;
+
+    console.log("👉 Data received from:", req.body);
+
+    // Find user and update only the fields that were provided in the request
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          ...(plan_id && { plan_id }),
+          ...(form_token !== undefined && { form_token }),
+          ...(email && { email }),
+          ...(stripe_customer_id && { stripe_customer_id }),
+          ...(role && { role }),
+          ...(form_ids && { form_ids }),
+        },
+      },
+      { new: true }, // Return the newly updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update User Error:", error);
+    res.status(500).json({ error: "Failed to update user" });
+  }
 };
 
 exports.deleteUser = async (req, res) => {
