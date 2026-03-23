@@ -5,6 +5,7 @@ import EditForm from "../pages/EditForm.vue";
 import FormGenerator from "../pages/FormGenerator.vue";
 import Profile from "../pages/Profile.vue";
 import Workspace from "../pages/Workspace.vue";
+import PreviewForm from "../pages/PreviewForm.vue";
 // auth
 import Register from "../pages/Register.vue";
 import Login from "../pages/Login.vue";
@@ -43,6 +44,11 @@ const routes = [
     path: "/workspace",
     name: "workspace",
     component: Workspace,
+  },
+  {
+    path: "/preview/f/:id",
+    name: "preview",
+    component: PreviewForm,
   },
 ];
 

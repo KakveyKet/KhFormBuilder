@@ -49,11 +49,11 @@ const dynamicRouter = (app) => {
             .json({ error: "User not found in the database." });
         }
 
-        // Check if the user has used up all their tokens
-        if (user.tokens_used >= user.form_token) {
+        // 🌟 UPDATED: Admins get unlimited tokens! Only block if they are NOT an admin.
+        if (user.role !== "admin" && user.tokens_used >= user.form_token) {
           return res.status(403).json({
             error:
-              "Token limit reached. You have used all 5 of your tokens! Please upgrade to generate more.",
+              "Token limit reached. You have used all of your tokens! Please upgrade to generate more.",
           });
         }
       } catch (err) {

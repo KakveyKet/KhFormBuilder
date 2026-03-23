@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+Khmer&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,6 +14,22 @@ body {
   font-family: "Plus Jakarta Sans", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
+}
+
+/* Use Noto Serif Khmer for Khmer text */
+html {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", "Noto Serif Khmer", sans-serif;
+}
+
+/* Add more specific targeting of Khmer text if necessary */
+@media (lang: km) {
+  body {
+    font-family: "Noto Serif Khmer", serif;
+  }
 }
 
 @layer components {
@@ -548,18 +565,18 @@ body {
     @apply w-10 h-10 border-4 border-gray-200 border-t-[#5855F6] rounded-full animate-spin;
   }
 
-  /* --- WORKSPACE LAYOUT --- */
+  /* --- WORKSPACE LAYOUT (Refined & Responsive) --- */
   .ws-layout {
-    @apply flex h-screen bg-white font-sans overflow-hidden text-[#202124];
+    @apply flex h-screen w-full bg-[#F8FAFF] font-sans overflow-hidden text-gray-900;
   }
 
   /* SIDEBAR */
   .ws-sidebar {
-    @apply w-[280px] flex flex-col flex-shrink-0 bg-white border-r border-gray-100 py-6;
+    @apply fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] flex flex-col flex-shrink-0 bg-[#F8FAFF] border-r border-gray-200/60 py-5 transition-transform duration-300 lg:static lg:translate-x-0;
   }
 
   .ws-sidebar-logo {
-    @apply px-6 h-12 flex items-center mb-2;
+    @apply px-6 h-10 flex items-center mb-4;
   }
 
   .ws-logo-link {
@@ -567,149 +584,178 @@ body {
   }
 
   .ws-logo-text {
-    @apply font-bold text-xl tracking-tight text-[#0F172A];
+    @apply font-bold text-[18px] tracking-tight text-gray-900;
   }
 
   .btn-ws-create {
-    @apply flex items-center gap-3 px-5 py-3.5 bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-300 font-bold text-sm text-gray-700 w-fit;
+    @apply flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-[#5855F6] to-[#6d6af7] text-white rounded-xl shadow-[0_4px_14px_0_rgba(88,85,246,0.25)] hover:shadow-[0_6px_20px_rgba(88,85,246,0.35)] transition-all duration-300 font-bold text-sm active:scale-95;
   }
 
   .ws-sidebar-nav {
-    @apply flex-1 px-3 space-y-1;
+    @apply flex-1 px-4 space-y-1.5;
   }
 
   .ws-nav-link {
-    @apply flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-[14px] font-bold text-gray-500 transition-all hover:bg-gray-200/50 hover:text-gray-900;
   }
 
   .ws-nav-link.active {
-    @apply bg-indigo-50 text-[#5855F6] font-bold;
+    @apply bg-white border border-gray-200 text-[#5855F6] shadow-sm;
   }
 
   .ws-sidebar-footer {
-    @apply px-4 py-6 border-t border-gray-50;
+    @apply px-4 mt-auto;
   }
 
   .ws-plan-card {
-    @apply p-4 bg-gray-50 rounded-2xl;
+    @apply p-4 bg-white border border-gray-200 rounded-2xl shadow-sm;
   }
 
   /* MAIN AREA */
   .ws-main {
-    @apply flex-1 flex flex-col h-screen overflow-hidden bg-white;
+    @apply flex-1 flex flex-col h-screen min-w-0 w-full overflow-hidden bg-white lg:rounded-tl-3xl lg:border-t lg:border-l border-gray-200/60 lg:shadow-2xl lg:shadow-gray-200/50;
   }
 
   .ws-top-nav {
-    @apply h-16 flex items-center justify-between px-6 flex-shrink-0;
+    @apply h-14 sm:h-16 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 border-b border-gray-100 min-w-0;
   }
 
   .ws-search-container {
-    @apply flex-1 max-w-2xl flex justify-center;
+    @apply flex-1 w-full max-w-xl min-w-0;
   }
 
   .ws-search-wrapper {
-    @apply w-full max-w-xl flex items-center gap-3 px-4 py-2.5 bg-[#f1f3f4] rounded-lg focus-within:bg-white focus-within:shadow-md transition-all;
+    @apply w-full flex items-center gap-2 px-3 py-1.5 sm:py-2 bg-gray-50 border border-gray-200/80 rounded-lg focus-within:bg-white focus-within:border-[#5855F6]/50 focus-within:ring-2 focus-within:ring-[#5855F6]/10 transition-all overflow-hidden;
   }
 
   .ws-search-input {
-    @apply w-full bg-transparent border-none text-sm outline-none placeholder-gray-500;
+    @apply w-full bg-transparent border-none text-[13px] sm:text-[14px] font-medium outline-none placeholder-gray-400 py-0.5 min-w-0;
   }
 
   .ws-top-actions {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-3 sm:gap-4 ml-2 sm:ml-4 flex-shrink-0;
   }
 
   .ws-icon-btn {
-    @apply p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors;
+    @apply p-1.5 rounded-md text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors;
   }
 
   .ws-user-avatar {
-    @apply w-9 h-9 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center font-bold text-sm border border-amber-300 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500 transition-all;
+    @apply w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 text-[#5855F6] flex items-center justify-center font-bold text-sm border border-indigo-200 cursor-pointer hover:shadow-md transition-all flex-shrink-0;
   }
 
   /* CONTENT AREA */
   .ws-content {
-    @apply flex-1 overflow-y-auto px-10 py-8;
+    @apply flex-1 overflow-y-auto px-4 sm:px-8 lg:px-12 py-6 lg:py-8 bg-[#FAFAFA] min-w-0 w-full;
   }
 
   .ws-section-header {
-    @apply flex items-center justify-between mb-2;
+    @apply flex flex-col sm:flex-row sm:items-end justify-between mb-6 lg:mb-8 gap-4;
   }
 
   .ws-section-title {
-    @apply text-lg font-bold text-gray-900;
+    @apply text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mb-1;
   }
 
   .ws-section-subtitle {
-    @apply text-sm text-gray-500;
+    @apply text-[13px] sm:text-sm font-medium text-gray-500;
   }
 
   .ws-filter-btn {
-    @apply flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200;
+    @apply flex items-center justify-center gap-2 px-3 py-2 text-[13px] font-bold text-gray-600 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 shadow-sm transition-all w-full sm:w-auto;
   }
 
+  /* METRICS CARDS */
   .ws-quick-stats {
-    @apply flex gap-6 mb-8 py-3 border-b border-gray-50;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8 lg:mb-10;
   }
 
-  .ws-quick-stat-item {
-    @apply text-xs font-medium uppercase tracking-wider;
+  .ws-stat-card {
+    @apply bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-3 sm:gap-4 hover:shadow-md transition-shadow min-w-0;
+  }
+
+  .ws-stat-icon {
+    @apply w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0;
+  }
+
+  .ws-stat-label {
+    @apply text-[11px] sm:text-[12px] font-bold text-gray-500 uppercase tracking-widest mb-0.5 truncate;
+  }
+
+  .ws-stat-value {
+    @apply text-xl sm:text-2xl font-bold text-gray-900 leading-none truncate;
   }
 
   /* GRID & CARDS */
   .ws-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-20;
   }
 
   .ws-card {
-    @apply bg-white border border-gray-200 rounded-xl overflow-hidden transition-all hover:shadow-lg cursor-default;
+    @apply bg-white border border-gray-200 rounded-[20px] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 cursor-pointer flex flex-col w-full min-w-0;
   }
 
+  /* The New Mini-Form CSS Graphic / Thumbnail */
   .ws-card-preview {
-    @apply h-36 flex items-center justify-center relative;
+    @apply h-32 sm:h-44 flex items-center justify-center relative border-b border-gray-100 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100;
+  }
+
+  .ws-mini-form {
+    @apply w-24 h-28 sm:w-32 sm:h-36 bg-white rounded-xl shadow-md border border-gray-200 p-2 sm:p-3.5 flex flex-col gap-1.5 sm:gap-2.5 transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:-translate-y-2 group-hover:shadow-2xl relative z-10;
+  }
+
+  .ws-mf-header {
+    @apply w-3/5 h-1.5 sm:h-2.5 bg-gray-200 rounded-full mb-0.5 sm:mb-1;
+  }
+
+  .ws-mf-line {
+    @apply w-full h-3 sm:h-5 bg-gray-50 rounded border border-gray-100;
+  }
+
+  .ws-mf-line-short {
+    @apply w-4/5 h-3 sm:h-5 bg-gray-50 rounded border border-gray-100;
+  }
+
+  .ws-mf-button {
+    @apply w-3/4 h-4 sm:h-6 bg-[#5855F6] rounded-md mt-auto shadow-sm opacity-90;
   }
 
   .ws-card-badge {
-    @apply absolute top-3 right-3 px-2 py-0.5 bg-white/60 backdrop-blur-sm rounded text-[10px] font-bold text-gray-600 uppercase tracking-tighter;
+    @apply absolute top-3 right-3 px-2 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-gray-700 tracking-wide border border-gray-100 shadow-sm flex items-center z-20;
   }
 
   .ws-card-info {
-    @apply p-4 border-t border-gray-50;
-  }
-
-  .ws-card-type-icon {
-    @apply w-6 h-6 bg-[#5855F6] rounded flex items-center justify-center flex-shrink-0;
+    @apply p-4 sm:p-5 bg-white flex-1 flex flex-col justify-between min-w-0;
   }
 
   .ws-card-title {
-    @apply text-sm font-bold text-gray-900 truncate;
+    @apply text-[14px] sm:text-[15px] font-bold text-gray-900 truncate mb-1;
   }
 
   .ws-card-action-btn {
-    @apply p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors;
+    @apply p-1.5 sm:p-2 bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors border border-gray-200;
   }
 
   .ws-card-meta {
-    @apply mt-2 text-[11px] text-gray-400 font-medium;
+    @apply text-[11px] sm:text-[12px] text-gray-400 font-medium flex items-center whitespace-nowrap truncate overflow-hidden;
   }
 
   /* STATES */
   .ws-loader-container {
-    @apply flex justify-center py-20;
+    @apply flex flex-col items-center justify-center py-20 w-full;
   }
 
   .ws-spinner {
-    @apply w-10 h-10 border-4 border-gray-100 border-t-[#5855F6] rounded-full animate-spin;
+    @apply w-10 h-10 border-4 border-gray-200 border-t-[#5855F6] rounded-full animate-spin;
   }
 
   .ws-empty-state {
-    @apply py-20 text-center text-gray-400 font-medium border-2 border-dashed border-gray-100 rounded-3xl;
+    @apply py-20 px-4 bg-white border border-gray-200 border-dashed rounded-[32px] text-center flex flex-col items-center justify-center shadow-sm w-full;
   }
 
   .ws-empty-icon {
     @apply text-4xl mb-4;
   }
-
   /* --- STUDIO / EDITOR LAYOUT --- */
   .studio-layout {
     @apply flex flex-col h-screen bg-[#F8FAFF] font-sans overflow-hidden;
@@ -823,6 +869,109 @@ body {
 
   .studio-prop-select {
     @apply w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none appearance-none;
+  }
+
+  .gen-layout {
+    @apply min-h-screen bg-[#F8FAFF] py-12 px-4 sm:px-6 font-sans;
+  }
+
+  .gen-container {
+    @apply max-w-3xl mx-auto flex flex-col gap-8;
+  }
+
+  .gen-login-warning {
+    @apply p-4 bg-orange-50 border border-orange-200 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm;
+  }
+
+  .gen-login-btn {
+    @apply px-6 py-2 bg-orange-500 text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap shadow-sm;
+  }
+
+  .gen-header {
+    @apply text-center space-y-3 mt-4 mb-2 animate-fade-up animate-once animate-duration-700;
+  }
+
+  .gen-title {
+    @apply text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight;
+  }
+
+  .gen-subtitle {
+    @apply text-gray-500 text-base md:text-lg max-w-2xl mx-auto leading-relaxed;
+  }
+
+  .gen-prompt-wrapper {
+    @apply relative bg-white rounded-2xl shadow-xl shadow-[#5855F6]/5 border border-gray-200 overflow-hidden transition-all duration-300 focus-within:ring-4 focus-within:ring-[#5855F6]/10 focus-within:border-[#5855F6] animate-fade-up animate-once animate-duration-700 animate-delay-100;
+  }
+
+  .gen-input {
+    @apply w-full bg-transparent border-none text-gray-800 text-lg px-4 py-3 focus:outline-none placeholder-gray-300 resize-none h-[120px] sm:h-[100px];
+  }
+
+  .gen-submit-btn {
+    @apply absolute bottom-3 right-3 px-6 py-2.5 bg-[#5855F6] text-white font-bold text-sm rounded-xl hover:bg-[#4338CA] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95;
+  }
+
+  .gen-suggestions {
+    @apply mt-2;
+  }
+
+  .gen-suggestion-pill {
+    @apply px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-full hover:border-[#5855F6] hover:text-[#5855F6] transition-colors shadow-sm;
+  }
+
+  .gen-error-banner {
+    @apply p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl flex items-center gap-3 text-sm font-bold shadow-sm;
+  }
+
+  /* LOADING SKELETON */
+  .gen-loading-state {
+    @apply mt-8 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm relative overflow-hidden;
+  }
+
+  .gen-skeleton-header {
+    @apply h-8 w-1/3 bg-gray-200 rounded-lg mb-8 animate-pulse;
+  }
+
+  .gen-skeleton-input {
+    @apply h-12 w-full bg-gray-100 rounded-xl animate-pulse;
+  }
+
+  /* RESULTS AREA */
+  .gen-results-area {
+    @apply space-y-6 mt-4;
+  }
+
+  .gen-success-card {
+    @apply bg-white border border-emerald-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-lg shadow-emerald-500/5;
+  }
+
+  .btn-primary-action {
+    @apply flex items-center justify-center gap-2 px-5 py-2.5 bg-[#5855F6] text-white text-sm font-bold rounded-xl hover:bg-[#4338CA] transition-all shadow-md active:scale-95 w-full sm:w-auto whitespace-nowrap;
+  }
+
+  .btn-secondary-action {
+    @apply flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-100 transition-all shadow-sm active:scale-95 w-full sm:w-auto whitespace-nowrap;
+  }
+
+  /* PREVIEW CARD */
+  .gen-preview-card {
+    @apply bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden;
+  }
+
+  .gen-preview-header {
+    @apply px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between;
+  }
+
+  .gen-form-group {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .gen-form-label {
+    @apply text-sm font-bold text-gray-700;
+  }
+
+  .gen-form-input {
+    @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5855F6] focus:bg-white transition-all;
   }
 }
 
