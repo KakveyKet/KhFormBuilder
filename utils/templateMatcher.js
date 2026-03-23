@@ -25,27 +25,44 @@ const matchTemplate = (inputText) => {
       title: "ទម្រង់ចុះឈ្មោះសកម្មភាព",
     };
   }
-  // if (
-  //   inputLower.includes("ចុះឈ្មោះចូលលេងកីឡា") ||
-  //   inputLower.includes("sport registration")
-  // ) {
-  //   return {
-  //     fields: formSchemas["ចុះឈ្មោះចូលលេងកីឡា"],
-  //     title: "ទម្រង់ចុះឈ្មោះចូលលេងកីឡា",
-  //   };
-  // }
-  // 3. Contact / ទាក់ទង
+
+  // 3. Event RSVP / សកម្មភាពចូលរួម
+  if (
+    inputLower.includes("event rsvp") ||
+    inputLower.includes("សកម្មភាពចូលរួម")
+  ) {
+    return {
+      fields: formSchemas.eventRSVP,
+      title: "Event RSVP Form",
+    };
+  }
+
+  // 4. Product Feedback / មតិយោបល់ផលិតផល
+  if (
+    inputLower.includes("product feedback") ||
+    inputLower.includes("មតិយោបល់ផលិតផល")
+  ) {
+    return {
+      fields: formSchemas.productFeedback,
+      title: "Product Feedback Form",
+    };
+  }
+
+  // 5. Volunteer Sign-Up / ចុះឈ្មោះស្ម័គ្រចិត្ត
+  if (inputLower.includes("volunteer") || inputLower.includes("ស្ម័គ្រចិត្ត")) {
+    return {
+      fields: formSchemas.volunteerSignup,
+      title: "Volunteer Sign-Up Form",
+    };
+  }
+
+  // 6. Contact / ទាក់ទង
   if (inputLower.includes("contact") || inputLower.includes("ទាក់ទង")) {
     return {
       fields: formSchemas.contact,
       title: "Contact Form",
     };
   }
-
-  // 💡 EASY TO ADD MORE HERE LATER!
-  // if (inputLower.includes("feedback") || inputLower.includes("មតិយោបល់")) {
-  //   return { fields: formSchemas.feedback, title: "Customer Feedback" };
-  // }
 
   // Default Fallback
   return {

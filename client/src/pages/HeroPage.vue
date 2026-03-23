@@ -128,7 +128,8 @@
         <!-- BUTTONS -->
         <div class="hero-actions">
           <!-- Added flex layout and a magic wand SVG to the primary button -->
-          <button
+          <router-link
+            to="/generate"
             class="btn-primary flex items-center justify-center gap-2 group"
           >
             <svg
@@ -155,7 +156,7 @@
               <path d="M11 3H9" />
             </svg>
             Generate Free with AI
-          </button>
+          </router-link>
           <!-- demo link - opens video directly in a new tab -->
           <a
             href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -203,6 +204,8 @@
 </template>
 
 <script>
+import router from "../routes";
+
 export default {
   setup() {
     return {};

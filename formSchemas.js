@@ -1,7 +1,3 @@
-// This file stores all the form templates.
-// You can easily add, edit, or remove templates here without touching the main server logic.
-// The keys (e.g., "registration", "អាពាហ៍ពិពាហ៍") are used by the AI to categorize user requests.
-
 const formSchemas = {
   registration: [
     { id: 1, label: "Full Name", type: "text", placeholder: "John Doe" },
@@ -16,7 +12,6 @@ const formSchemas = {
   contact: [
     { id: 1, label: "Name", type: "text", placeholder: "Your Name" },
     { id: 2, label: "Email", type: "email", placeholder: "Your Email" },
-    // 🌟 CHANGED: Now uses a textarea for longer messages!
     {
       id: 3,
       label: "Message",
@@ -24,7 +19,6 @@ const formSchemas = {
       placeholder: "How can we help?",
     },
   ],
-  // 🌟 NEW: A complex survey template demonstrating Select dropdowns and Checkboxes!
   survey: [
     {
       id: 1,
@@ -60,7 +54,101 @@ const formSchemas = {
       placeholder: "Enter details...",
     },
   ],
-  // 🌟 KHMER TEMPLATES:
+  eventRSVP: [
+    { id: 1, label: "Full Name", type: "text", placeholder: "John Doe" },
+    {
+      id: 2,
+      label: "Email Address",
+      type: "email",
+      placeholder: "john@example.com",
+    },
+    { id: 3, label: "Phone Number", type: "text", placeholder: "012 345 6789" },
+    {
+      id: 4,
+      label: "Will You Attend?",
+      type: "select",
+      options: ["Yes", "No", "Maybe"],
+    },
+    {
+      id: 5,
+      label: "Dietary Restrictions",
+      type: "textarea",
+      placeholder: "Vegetarian, Gluten-Free, etc.",
+    },
+    {
+      id: 6,
+      label: "Additional Comments",
+      type: "textarea",
+      placeholder: "Any other details?",
+    },
+  ],
+  productFeedback: [
+    { id: 1, label: "Product Name", type: "text", placeholder: "Product ABC" },
+    {
+      id: 2,
+      label: "Rating",
+      type: "select",
+      options: [
+        "1 - Poor",
+        "2 - Fair",
+        "3 - Good",
+        "4 - Very Good",
+        "5 - Excellent",
+      ],
+    },
+    {
+      id: 3,
+      label: "Would You Recommend This Product?",
+      type: "radio",
+      options: ["Yes", "No"],
+    },
+    {
+      id: 4,
+      label: "What Did You Like?",
+      type: "textarea",
+      placeholder: "Explain what you liked about the product.",
+    },
+    {
+      id: 5,
+      label: "What Can Be Improved?",
+      type: "textarea",
+      placeholder: "Explain what can be improved.",
+    },
+  ],
+  volunteerSignup: [
+    { id: 1, label: "Full Name", type: "text", placeholder: "John Doe" },
+    {
+      id: 2,
+      label: "Email Address",
+      type: "email",
+      placeholder: "john@example.com",
+    },
+    { id: 3, label: "Phone Number", type: "text", placeholder: "012 345 6789" },
+    {
+      id: 4,
+      label: "Availability",
+      type: "select",
+      options: ["Morning", "Afternoon", "Evening"],
+    },
+    {
+      id: 5,
+      label: "Preferred Volunteer Role",
+      type: "text",
+      placeholder: "e.g., Event Coordinator",
+    },
+    {
+      id: 6,
+      label: "Why Do You Want to Volunteer?",
+      type: "textarea",
+      placeholder: "Share your motivation for volunteering.",
+    },
+    {
+      id: 7,
+      label: "Previous Experience",
+      type: "textarea",
+      placeholder: "Any relevant volunteer experience?",
+    },
+  ],
   អាពាហ៍ពិពាហ៍: [
     {
       id: 1,
