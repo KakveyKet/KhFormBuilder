@@ -20,12 +20,17 @@
         </div>
       </transition>
 
-      <!-- Header -->
-      <div class="gen-header">
-        <div class="gen-badge">
-          <span class="w-2 h-2 rounded-full bg-[#5855F6] animate-pulse"></span>
-          AI Form Generator
+      <!-- Header & Logo -->
+      <div class="gen-header flex flex-col items-center text-center">
+        <!-- 🌟 UPDATED: Added your Logo here! -->
+        <div class="flex items-center gap-2 mb-6 animate-fade-down">
+          <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="shadow-sm rounded-xl">
+            <rect width="32" height="32" rx="8" fill="#5855F6"/>
+            <circle cx="16" cy="16" r="6" fill="white"/>
+          </svg>
+          <span class="font-bold text-2xl text-gray-900 tracking-tight">លំហ.AI <span class="text-[#5855F6]">Form</span></span>
         </div>
+        
         <h1 class="gen-title">What do you want to build today?</h1>
         <p class="gen-subtitle">Describe your ideal data collection form in plain English or Khmer, and our AI will
           generate a production-ready interface instantly.</p>
@@ -47,7 +52,7 @@
           <div class="flex items-center gap-3">
             <button v-if="hasSpeechRecognition" @click="toggleRecording" :disabled="!currentUser || isLoading"
               :title="isRecording ? 'Stop recording' : 'Start voice typing'" class="gen-voice-btn"
-              :class="isRecording ? 'active' : ''">
+              :class="isRecording ? 'active bg-red-50 text-red-500 border-red-200 animate-pulse' : ''">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
@@ -57,7 +62,7 @@
             </button>
             <span v-if="isRecording"
               class="text-xs font-bold text-red-500 animate-pulse flex items-center gap-1.5 uppercase tracking-widest">
-              Recording...
+              <span class="w-2 h-2 rounded-full bg-red-500"></span> Recording...
             </span>
           </div>
 
@@ -206,18 +211,32 @@
               <div class="gen-browser-dot bg-amber-400"></div>
               <div class="gen-browser-dot bg-emerald-400"></div>
             </div>
-            <div class="flex-1 text-center">
-              <span
-                class="text-xs font-mono text-gray-400 bg-white px-3 py-1 rounded-md border border-gray-200">preview.local/{{
-                  formId || 'new-form' }}</span>
+            
+            <div class="flex-1 text-center flex justify-center">
+              <span class="text-xs font-mono text-gray-400 bg-white px-3 py-1 rounded-md border border-gray-200 truncate max-w-[200px] sm:max-w-xs">
+                preview.local/{{ formId || 'new-form' }}
+              </span>
             </div>
             <div class="w-10"></div> <!-- Spacer for centering -->
           </div>
 
-          <form @submit.prevent class="p-6 sm:p-10 pointer-events-none bg-white">
-            <div class="mb-8 pb-6 border-b border-gray-100 text-center sm:text-left">
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ prediction || 'Generated Form' }}</h2>
-              <p class="text-sm text-gray-500">Please fill out the form below.</p>
+          <form @submit.prevent class="p-6 sm:p-10 pointer-events-none bg-white relative">
+            
+            <!-- 🌟 UPDATED: Added your Logo to the Preview Header -->
+            <div class="mb-8 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div class="text-center sm:text-left">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ prediction || 'Generated Form' }}</h2>
+                <p class="text-sm text-gray-500">Please fill out the form below.</p>
+              </div>
+              
+              <!-- Logo injected here -->
+              <div class="flex items-center justify-center sm:justify-end gap-2 opacity-70">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="32" height="32" rx="8" fill="#5855F6"/>
+                  <circle cx="16" cy="16" r="6" fill="white"/>
+                </svg>
+                <span class="text-xs font-bold text-gray-500">លំហ.AI Form</span>
+              </div>
             </div>
 
             <div class="space-y-5">
@@ -442,3 +461,7 @@ const predictMask = async () => {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+/* Scoped styles kept minimal; bulk logic is in styles.css */
+</style>

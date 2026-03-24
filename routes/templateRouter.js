@@ -1,0 +1,8 @@
+const express = require('express');
+const router = express.Router();
+const templateController = require('../controllers/templateController');
+
+// Endpoint: GET /api/templates
+router.get('/', templateController.getTemplates);
+
+module.exports = router;

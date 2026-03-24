@@ -6,6 +6,7 @@ import FormGenerator from "../pages/FormGenerator.vue";
 import Profile from "../pages/Profile.vue";
 import Workspace from "../pages/Workspace.vue";
 import PreviewForm from "../pages/PreviewForm.vue";
+import Template from "../pages/Template.vue";
 // auth
 import Register from "../pages/Register.vue";
 import Login from "../pages/Login.vue";
@@ -50,6 +51,11 @@ const routes = [
     name: "preview",
     component: PreviewForm,
   },
+  {
+    path: "/template",
+    name: "template",
+    component: Template,
+  }
 ];
 
 const router = createRouter({

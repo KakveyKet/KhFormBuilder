@@ -1,5 +1,23 @@
 <template>
   <div class="ws-layout relative">
+    
+    <!-- 🌟 NEW: Global Toast Notification for Copying -->
+    <transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="transform translate-y-4 opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform translate-y-4 opacity-0"
+    >
+      <div v-if="toastMessage" class="fixed bottom-10 right-10 z-50 bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+         <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-400 w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+         <span class="font-bold text-sm">{{ toastMessage }}</span>
+      </div>
+    </transition>
+
     <!-- Mobile Sidebar Backdrop Overlay -->
     <div v-if="isSidebarOpen" @click="isSidebarOpen = false"
       class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"></div>
@@ -280,6 +298,7 @@
 
                 <!-- Quick Actions (Hover) -->
                 <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white pl-2">
+                  
                   <!-- Edit Button -->
                   <button @click="editForm(form._id)"
                     class="p-1.5 text-gray-400 hover:text-theme-primary hover:bg-theme-primary/10 rounded-md transition-colors"
@@ -290,13 +309,24 @@
                     </svg>
                   </button>
 
+                  <!-- 🌟 NEW: Copy Share Link Button -->
+                  <button @click="copyShareLink(form._id)"
+                    class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
+                    title="Copy Share Link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                  </button>
+
+                  <!-- Publish/Unpublish Button -->
                   <button @click="openPublishModal(form)" class="p-1.5 text-gray-400 rounded-md transition-colors"
                     :class="form.is_published
                         ? 'hover:text-orange-500 hover:bg-orange-50'
                         : 'hover:text-emerald-500 hover:bg-emerald-50'
                       " :title="form.is_published ? 'Unpublish Form' : 'Publish Form'
                       ">
-                    <!-- Globe (Published) -->
                     <svg v-if="form.is_published" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                       viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                       stroke-linejoin="round">
@@ -304,7 +334,6 @@
                       <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                       <path d="M2 12h20" />
                     </svg>
-                    <!-- Upload/Draft (Not Published) -->
                     <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                       stroke-linejoin="round">
@@ -466,6 +495,9 @@ const forms = ref([]);
 const isLoading = ref(true);
 const isSidebarOpen = ref(false);
 
+// 🌟 NEW: Toast Message State
+const toastMessage = ref("");
+
 // Modal & Actions State
 const isActionLoading = ref(false);
 const deleteModal = ref({ isOpen: false, formId: null });
@@ -515,7 +547,6 @@ onMounted(async () => {
             ? formIdRef.$oid || formIdRef._id
             : formIdRef;
         try {
-          // 🌟 USING THE CORRECT ENDPOINT /api/formRoutes/
           const response = await axios.get(
             `http://localhost:3000/api/formRoutes/${actualId}`,
           );
@@ -544,6 +575,21 @@ const goToProfile = () => {
   window.location.href = "/profile";
 };
 
+// 🌟 NEW: Copy Link Function
+const copyShareLink = (id) => {
+  const url = `${window.location.origin}/preview/f/${id}`;
+  
+  const el = document.createElement('textarea');
+  el.value = url;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+
+  toastMessage.value = "Live link copied to clipboard!";
+  setTimeout(() => { toastMessage.value = ""; }, 3000);
+};
+
 // 🌟 MODAL HANDLERS
 const closeModals = () => {
   deleteModal.value = { isOpen: false, formId: null };
@@ -563,7 +609,6 @@ const executeDelete = async () => {
   isActionLoading.value = true;
 
   try {
-    // 🌟 USING THE CORRECT ENDPOINT /api/formRoutes/
     await axios.delete(
       `http://localhost:3000/api/formRoutes/${deleteModal.value.formId}`,
     );
@@ -573,7 +618,6 @@ const executeDelete = async () => {
     closeModals();
   } catch (error) {
     console.error("Error deleting form:", error);
-    // Silent fail handled for UX, but could add toast notification here
   } finally {
     isActionLoading.value = false;
   }
@@ -587,12 +631,10 @@ const executePublish = async () => {
     const targetForm = publishModal.value.form;
     const newStatus = !targetForm.is_published;
 
-    // 🌟 USING THE CORRECT ENDPOINT /api/formRoutes/
     await axios.put(`http://localhost:3000/api/formRoutes/${targetForm._id}`, {
       is_published: newStatus,
     });
 
-    // Update local state directly so UI updates instantly
     const formIndex = forms.value.findIndex((f) => f._id === targetForm._id);
     if (formIndex !== -1) {
       forms.value[formIndex].is_published = newStatus;
@@ -608,7 +650,6 @@ const executePublish = async () => {
 </script>
 
 <style scoped>
-/* Scoped styles can handle anything not covered by global styles */
 .ws-card-action-btn {
   @apply p-1.5 flex items-center justify-center;
 }
