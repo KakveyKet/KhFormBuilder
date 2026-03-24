@@ -1,118 +1,114 @@
 <template>
   <div class="profile-page-wrapper">
     <div class="profile-container">
-      <!-- Page Header -->
+
       <div class="profile-header-group">
         <h1 class="profile-title">Account Settings</h1>
-        <p class="profile-subtitle">
-          Manage your personal information, API usage, and plan preferences.
-        </p>
+        <p class="profile-subtitle">Manage your personal information, API usage, and plan preferences.</p>
       </div>
 
-      <!-- Main Profile Card -->
-      <div v-if="user" class="profile-card">
-        <!-- Top Section: Avatar & Info -->
+      <!-- Show profile only when loaded -->
+      <div v-if="user && !isLoading" class="profile-card">
+
         <div class="profile-user-section">
           <div class="profile-avatar">
-            {{ user.email.charAt(0) }}
+            <!-- Grab the first letter of their email -->
+            {{ user.email.charAt(0).toUpperCase() }}
           </div>
           <div class="profile-user-details">
-            <h2 class="profile-user-email">{{ user.email }}</h2>
+            <!-- Split email to make a nice username (e.g. john from john@gmail.com) -->
+            <h2 class="profile-user-email">{{ user.email.split('@')[0] }}</h2>
             <div class="profile-badge-row">
               <span class="profile-badge-active">
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"
-                ></span>
-                Active Account
+                <span class="status-dot"></span>
+                <!-- Now this works because we fetch the real role! -->
+                {{ user.role === 'admin' ? 'Administrator' : 'Active Account' }}
               </span>
-              <span class="profile-id-text">User ID: {{ user._id }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Middle Section: Token Usage -->
+        <div class="profile-info-grid">
+          <div class="info-item">
+            <label class="info-label">Email Address</label>
+            <p class="info-value">{{ user.email }}</p>
+          </div>
+          <div class="info-item">
+            <label class="info-label">Current Role</label>
+            <p class="info-value capitalize">{{ user.role || 'User' }}</p>
+          </div>
+          <div class="info-item">
+            <label class="info-label">Member Since</label>
+            <!-- Now this works because we fetch the real created_at date! -->
+            <p class="info-value">{{ formatDate(user.created_at) }}</p>
+          </div>
+          <div class="info-item">
+            <label class="info-label">Total Assets</label>
+            <p class="info-value">{{ user.form_ids ? user.form_ids.length : 0 }} Forms Created</p>
+          </div>
+        </div>
+
         <div class="profile-token-section">
           <div class="profile-token-header">
             <div class="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="text-[#5855F6]"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" class="text-[#5855F6]">
                 <path
-                  d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
-                />
+                  d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
               </svg>
               <h3 class="profile-token-title">AI Generation Credits</h3>
             </div>
-            <span class="profile-token-count"
-              >{{ tokensRemaining }} / {{ user.form_token }} Available</span
-            >
+            <span class="profile-token-count">{{ tokensRemaining }} / {{ user.form_token }} Available</span>
           </div>
 
-          <!-- Progress Bar -->
           <div class="profile-progress-bg">
-            <div
-              class="profile-progress-fill"
-              :style="{ width: tokenPercentage + '%' }"
-            ></div>
+            <div class="profile-progress-fill" :style="{ width: tokenPercentage + '%' }"></div>
           </div>
 
           <div class="profile-stats-row">
-            <span class="profile-stat-text"
-              >{{ user.tokens_used }} forms generated</span
-            >
-            <span class="profile-stat-text">Plan: Free Tier</span>
+            <span class="profile-stat-text">{{ user.tokens_used }} tokens consumed</span>
+            <!-- If they have more than 5 tokens, they must be on a Pro/Admin plan -->
+            <span class="profile-stat-text">Tier: {{ user.form_token > 5 ? 'Pro Plan' : 'Free Trial' }}</span>
           </div>
 
-          <!-- Upgrade Alert -->
-          <div v-if="tokensRemaining <= 1" class="profile-alert-box">
+          <div v-if="tokensRemaining <= 1 && user.role !== 'admin'" class="profile-alert-box">
             <div class="profile-alert-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                 <path d="M12 9v4" />
                 <path d="M12 17h.01" />
               </svg>
             </div>
             <div class="flex-grow">
-              <h4 class="profile-alert-title">Low Balance Warning</h4>
-              <p class="profile-alert-desc">
-                You're nearly out of generation credits. Upgrade to Pro for
-                unlimited forms.
-              </p>
-              <button class="btn-upgrade-inline">Upgrade Now</button>
+              <h4 class="profile-alert-title">Token Limit Reached</h4>
+              <p class="profile-alert-desc">You've consumed all your free generation credits. Upgrade your subscription
+                to continue building.</p>
+              <button class="btn-upgrade-inline">Explore Plans</button>
             </div>
           </div>
         </div>
 
-        <!-- Bottom Section: Actions -->
         <div class="profile-footer">
-          <button class="btn-text-link">Need support? Open a ticket</button>
+          <button class="btn-text-link">
+            Request Data Export
+          </button>
           <button @click="handleLogout" class="btn-outline-danger">
-            Log Out
+            Sign Out
           </button>
         </div>
       </div>
 
-      <!-- Loading Fallback -->
-      <div v-else class="profile-loading">
-        <div class="profile-spinner"></div>
-        <p>Syncing account data...</p>
+      <!-- Shows while Axios is fetching the DB data -->
+      <div v-else class="profile-loading text-center py-20 flex flex-col items-center">
+        <svg class="animate-spin h-8 w-8 text-[#5855F6] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+        <p class="text-gray-500 font-medium">Fetching secure profile data...</p>
       </div>
     </div>
   </div>
@@ -120,8 +116,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import axios from "axios"; // 🌟 NEEDED TO FETCH FROM DATABASE
 
 const user = ref(null);
+const isLoading = ref(true); // 🌟 ADDED LOADING STATE
 
 const tokensRemaining = computed(() => {
   if (!user.value) return 0;
@@ -134,12 +132,36 @@ const tokenPercentage = computed(() => {
   return Math.min(percentage, 100);
 });
 
-onMounted(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    user.value = JSON.parse(storedUser);
-  } else {
+const formatDate = (dateObj) => {
+  if (!dateObj) return 'N/A';
+  const date = dateObj.$date ? new Date(dateObj.$date) : new Date(dateObj);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+onMounted(async () => {
+  const storedUserStr = localStorage.getItem("user");
+  if (!storedUserStr) {
     window.location.href = "/login";
+    return;
+  }
+
+  const parsedUser = JSON.parse(storedUserStr);
+  user.value = parsedUser; // Load basic local info first
+
+  try {
+    // 🌟 FETCH FRESH DATA FROM MONGODB!
+    // This gives us the missing `role`, `created_at`, and `form_ids` array.
+    const response = await axios.get(`http://localhost:3000/api/userRoutes/${parsedUser._id}`);
+
+    user.value = response.data; // Replace basic info with complete database info
+
+    // Optional: Keep LocalStorage perfectly in sync with the database
+    localStorage.setItem("user", JSON.stringify(response.data));
+
+  } catch (error) {
+    console.error("Failed to fetch fresh profile data:", error);
+  } finally {
+    isLoading.value = false;
   }
 });
 
@@ -149,3 +171,7 @@ const handleLogout = () => {
   window.location.href = "/login";
 };
 </script>
+
+<style scoped>
+/* Assuming your custom classes like .profile-page-wrapper are defined globally or in your style block */
+</style>

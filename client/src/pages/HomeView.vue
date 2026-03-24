@@ -1,13 +1,12 @@
 <template>
   <div>
     <Navbar />
-    <div
-      class="relative animate-fade-up animate-once animate-duration-500 animate-delay-300 animate-ease-out"
-    >
+    <div id="features"
+      class="relative animate-fade-up animate-once animate-duration-500 animate-delay-300 animate-ease-out">
       <HeroPage />
-      <Features />
-      <PricingComponent />
-      <CTA />
+      <Features id="features" />
+      <PricingComponent id="pricing" />
+      <CTA id="cta" />
       <Footer />
     </div>
     <!-- <FormGenerator /> -->

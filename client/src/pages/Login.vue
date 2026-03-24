@@ -325,6 +325,7 @@ const handleLogin = async () => {
 
     localStorage.setItem("authToken", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
+
     window.location.href = "/";
   } catch (error) {
     errorMessage.value = error.response?.data?.error || "Failed to log in.";

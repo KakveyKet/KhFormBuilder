@@ -59,12 +59,23 @@ exports.createUser = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password_hash");
+    // Get full data of users
+    const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 };
+// exports.getUsers = async (req, res) => {
+//   try {
+
+//     const users = await User.find().select("-password_hash");
+//     // get full data of users
+//     res.status(200).json(users);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to fetch users" });
+//   }
+// };
 
 // 🌟 NEW: Fetch a single user by their ID
 exports.getUserById = async (req, res) => {
@@ -91,6 +102,7 @@ exports.updateUser = async (req, res) => {
       role,
       form_ids,
       form_token,
+      username
     } = req.body;
 
     console.log("👉 Data received from:", req.body);
@@ -106,6 +118,10 @@ exports.updateUser = async (req, res) => {
           ...(stripe_customer_id && { stripe_customer_id }),
           ...(role && { role }),
           ...(form_ids && { form_ids }),
+          ...(username && { username }),
+          ...(password && {
+            password_hash: await bcrypt.hash(password, 10),
+          }),
         },
       },
       { new: true }, // Return the newly updated document
