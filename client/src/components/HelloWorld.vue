@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-2xl mx-auto my-10 p-6 font-inter">
+  <div class="max-w-2xl mx-auto my-10 p-6  ">
     <h1 class="text-2xl font-bold text-theme-text mb-2">AI Form Generator</h1>
     <p class="text-theme-muted mb-6">
       Try typing what you want in natural language (e.g.,

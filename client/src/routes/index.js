@@ -7,6 +7,8 @@ import Profile from "../pages/Profile.vue";
 import Workspace from "../pages/Workspace.vue";
 import PreviewForm from "../pages/PreviewForm.vue";
 import Template from "../pages/Template.vue";
+import Teams from "../pages/Teams.vue";
+import RequestQuote from "../pages/RequestQuote.vue";
 // auth
 import Register from "../pages/Register.vue";
 import Login from "../pages/Login.vue";
@@ -55,6 +57,16 @@ const routes = [
     path: "/template",
     name: "template",
     component: Template,
+  },
+  {
+    path: "/teams",
+    name: "teams",
+    component: Teams,
+  },
+  {
+    path: "/request-quote",
+    name: "request-quote",
+    component: RequestQuote,
   }
 ];
 

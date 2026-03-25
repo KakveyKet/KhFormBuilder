@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F8FAFF] font-inter flex flex-col">
+  <div class="min-h-screen bg-[#F8FAFF] flex flex-col">
     
     <!-- Header Navigation -->
     <header class="h-16 bg-white border-b border-theme-border flex items-center justify-between px-6 sm:px-10 flex-shrink-0 z-10 sticky top-0">

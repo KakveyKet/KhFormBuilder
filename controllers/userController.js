@@ -4,8 +4,15 @@ const bcrypt = require("bcryptjs"); // You will need to run: npm install bcryptj
 // Create a new user (Registration)
 exports.createUser = async (req, res) => {
   try {
-    const { email, password, plan_id, stripe_customer_id, role, form_ids } =
-      req.body;
+    const {
+      email,
+      username,
+      password,
+      plan_id,
+      stripe_customer_id,
+      role,
+      form_ids,
+    } = req.body;
 
     // 1. Basic validation
     if (!email || !password) {
@@ -28,6 +35,7 @@ exports.createUser = async (req, res) => {
     // 🌟 STEP 1 OF THE PROCESS: GIVE THE USER 5 TOKENS UPON REGISTRATION!
     const newUser = new User({
       email,
+      username: email.split("@")[0],
       password_hash,
       plan_id: plan_id || null,
       stripe_customer_id: stripe_customer_id || null,
@@ -102,7 +110,7 @@ exports.updateUser = async (req, res) => {
       role,
       form_ids,
       form_token,
-      username
+      username,
     } = req.body;
 
     console.log("👉 Data received from:", req.body);

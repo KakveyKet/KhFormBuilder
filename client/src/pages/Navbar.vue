@@ -14,9 +14,9 @@
       <!-- Desktop Navigation Links -->
       <nav class="nav-desktop-menu">
         <a href="#features" class="nav-link">Features</a>
-        <a href="#pricing" class="nav-link">Pricing</a>
-        <a href="#cta" class="nav-link">CTA</a>
-        <a href="#footer" class="nav-link">Footer</a>
+        <a href="#collaborate " class="nav-link">Collaborate </a>
+        <router-link to="/request-quote" class="nav-link">Contact</router-link>
+        <router-link to="/teams" class="nav-link">About Us</router-link>
       </nav>
 
       <!-- Action Buttons -->
@@ -89,9 +89,10 @@
       <div v-if="isMobileMenuOpen" class="nav-mobile-menu">
         <div class="flex flex-col p-2">
           <a href="#features" class="nav-mobile-link">Features</a>
-          <a href="#pricing" class="nav-mobile-link">Pricing</a>
-          <a href="#cta" class="nav-mobile-link">Contact</a>
-          <a href="#cta" class="nav-mobile-link">About Us</a>
+          <a href="#collaborate" class="nav-mobile-link">Collaborate </a>
+          <router-link to="/request-quote" class="nav-mobile-link">Contact</router-link>
+          <router-link to="/teams" class="nav-mobile-link">About Us</router-link>
+
 
           <div class="h-px bg-gray-100 my-2 mx-2"></div>
 

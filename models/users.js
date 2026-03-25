@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
+  username: { type: String, required: false },
   email: { type: String, required: true, unique: true },
   password_hash: { type: String, default: null }, // Optional field
   oauth_provider: { type: String, default: null }, // Optional field
@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     ref: "Plan",
     required: false, // Not required for OAuth
   },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
+  role: { type: String, enum: ["user", "admin", "superadmin"], default: "admin" },
   stripe_customer_id: { type: String, required: false }, // Optional field
   form_ids: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Form", required: false }, // Optional field, user can have multiple forms

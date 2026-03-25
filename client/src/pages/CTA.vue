@@ -10,8 +10,7 @@
         <div class="cta-content">
           <h2 class="cta-title">Ready to bring your ideas to life?</h2>
           <p class="cta-subtitle">
-            Join the most playful community of creators. No credit card required
-            to get started.
+            Join the most playful community of creators. 
           </p>
           <router-link to="/generate" class="cta-button"
             >Start Building Today</router-link

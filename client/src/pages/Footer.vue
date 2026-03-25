@@ -24,14 +24,14 @@
         <div class="footer-links-wrapper">
           
           <!-- Product -->
-          <div>
+          <!-- <div>
             <h4 class="footer-heading">Product</h4>
             <div class="footer-list">
               <a href="#" class="footer-link">Features</a>
               <a href="#" class="footer-link">Pricing</a>
               <a href="#" class="footer-link">Showcase</a>
             </div>
-          </div>
+          </div> -->
 
           <!-- Team (Changed from Company) -->
           <div>
@@ -64,12 +64,11 @@
           © 2026 លំហ.AI Form. All rights reserved.
         </p>
         
-        <div class="footer-social-wrapper">
-          <!-- Social Icons Placeholders (Using subtle rounded squares to match the image) -->
+        <!-- <div class="footer-social-wrapper">
           <div class="footer-social-icon"></div>
           <div class="footer-social-icon"></div>
           <div class="footer-social-icon"></div>
-        </div>
+        </div> -->
       </div>
 
     </div>

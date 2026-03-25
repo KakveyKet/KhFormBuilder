@@ -1,11 +1,11 @@
 <template>
-  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] font-inter overflow-hidden">
+  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] overflow-hidden">
 
     <!-- ================= TOP TOOLBAR ================= -->
     <header
       class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-10 shadow-sm">
       <div class="flex items-center gap-4">
-        <a href="/dashboard"
+        <a href="/workspace"
           class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#5855F6] transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -115,7 +115,7 @@
                 class="w-6 h-6 text-gray-500 group-hover:text-[#5855F6] mb-2 transition-colors"></span>
               <span
                 class="text-[11px] font-bold text-gray-600 group-hover:text-[#5855F6] text-center transition-colors">{{
-                element.label }}</span>
+                  element.label }}</span>
             </div>
           </draggable>
         </div>
@@ -140,11 +140,11 @@
           class="w-full max-w-2xl shadow-xl shadow-gray-200/50 rounded-xl min-h-[800px] border border-[var(--tpl-border)] bg-[var(--tpl-bg)] text-[var(--tpl-text)] relative flex flex-col animate-fade-up transition-colors duration-500 overflow-hidden">
 
           <!-- Intelligent View Badge -->
-          <div
+          <!-- <div
             class="absolute top-0 right-4 sm:right-8 -translate-y-1/2 px-3 py-1 text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-md flex items-center gap-1.5 z-20"
             style="background-color: var(--tpl-primary);">
             <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Studio View
-          </div>
+          </div> -->
 
           <!-- Paper Header -->
           <div class="p-6 sm:p-10 pb-6 border-b border-[var(--tpl-border)] flex-shrink-0 relative">
@@ -265,7 +265,7 @@
           </svg>
           <h2 class="text-xl font-bold text-gray-900 mb-2">Instance Not Found</h2>
           <p class="text-gray-500 mb-6">{{ errorMessage || "Could not find a valid form ID." }}</p>
-          <router-link to="/dashboard" class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
+          <router-link to="/workspace" class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
             to
             Hub</router-link>
         </div>
@@ -430,7 +430,7 @@ onMounted(async () => {
   // Fetch Allowed Templates based on user
   if (currentUser.value) {
     try {
-      const templateRes = await axios.get(`http://localhost:3000/api/templates?userId=${currentUser.value._id}`);
+      const templateRes = await axios.get(`http://localhost:3000/api/templateRouter?userId=${currentUser.value._id}`);
       templates.value = templateRes.data;
     } catch (err) {
       console.warn("Failed to load templates from API, using fallbacks.", err);
