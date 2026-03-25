@@ -577,7 +577,7 @@ const goToProfile = () => {
 
 // 🌟 NEW: Copy Link Function
 const copyShareLink = (id) => {
-  const url = `${window.location.origin}/preview/f/${id}`;
+  const url = `${window.location.origin}/public/f/${id || currentFormId.value}`;
   
   const el = document.createElement('textarea');
   el.value = url;

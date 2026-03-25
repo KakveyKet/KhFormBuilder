@@ -1,18 +1,18 @@
 <template>
-  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] overflow-hidden">
+  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] font-inter overflow-hidden">
 
     <!-- ================= TOP TOOLBAR ================= -->
     <header
       class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-10 shadow-sm">
       <div class="flex items-center gap-4">
-        <a href="/workspace"
+        <button @click="$router.go(-1)"
           class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#5855F6] transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
           Back
-        </a>
+        </button>
         <div class="h-5 w-px bg-gray-200"></div>
         <div class="flex items-center gap-2">
           <div class="w-6 h-6 bg-[#5855F6] rounded-md flex items-center justify-center">
@@ -35,7 +35,6 @@
           {{ successMessage }}
         </span>
 
-        <!-- 🌟 NEW: Share/Copy Link Button -->
         <button v-if="currentFormId && formLoaded" @click="copyShareLink"
           class="px-3 sm:px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -74,17 +73,188 @@
     <div class="flex-1 flex overflow-hidden">
 
       <!-- LEFT SIDEBAR: Elementor-Style Palette -->
-      <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col hidden md:flex">
-        <!-- Settings Block -->
-        <div class="p-5 border-b border-gray-100 flex-shrink-0">
-          <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Form Details</label>
-          <div class="space-y-3">
+      <aside class="w-[300px] bg-white border-r border-gray-200 flex-shrink-0 flex flex-col hidden md:flex">
+
+        <!-- Form Details + Text Editor Toolbars -->
+        <div class="p-5 border-b border-gray-100 flex-shrink-0 space-y-5">
+          <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Form Content</label>
+
+          <!-- Title Section -->
+          <div class="space-y-2">
             <input v-model="formData.title"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-[#5855F6] outline-none transition-all"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm font-bold focus:bg-white focus:ring-2 focus:ring-[#5855F6] outline-none transition-all"
               placeholder="Form Title" />
+
+            <div v-if="formData.typography"
+              class="flex items-center gap-1 p-1 bg-gray-50 border border-gray-200 rounded-md shadow-sm">
+              <button @click="toggleStyle('title', 'weight', 'bold', 'normal')"
+                :class="formData.typography.title.weight === 'bold' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Bold">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 12a4 4 0 0 0 0-8H6v8" />
+                  <path d="M15 20a4 4 0 0 0 0-8H6v8Z" />
+                </svg>
+              </button>
+              <button @click="toggleStyle('title', 'style', 'italic', 'normal')"
+                :class="formData.typography.title.style === 'italic' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Italic">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="4" x2="10" y2="4" />
+                  <line x1="14" y1="20" x2="5" y2="20" />
+                  <line x1="15" y1="4" x2="9" y2="20" />
+                </svg>
+              </button>
+              <button @click="toggleStyle('title', 'decoration', 'underline', 'none')"
+                :class="formData.typography.title.decoration === 'underline' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Underline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
+                  <line x1="4" y1="21" x2="20" y2="21" />
+                </svg>
+              </button>
+
+              <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+              <button @click="formData.typography.title.align = 'left'"
+                :class="formData.typography.title.align === 'left' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                  <line x1="17" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+              <button @click="formData.typography.title.align = 'center'"
+                :class="formData.typography.title.align === 'center' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <line x1="21" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+              <button @click="formData.typography.title.align = 'right'"
+                :class="formData.typography.title.align === 'right' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Right">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                  <line x1="21" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+
+              <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+              <div
+                class="relative flex items-center justify-center w-6 h-6 rounded cursor-pointer overflow-hidden border border-gray-200 ml-1"
+                title="Text Color">
+                <input type="color" v-model="formData.typography.title.color"
+                  class="absolute -inset-2 w-10 h-10 cursor-pointer" />
+              </div>
+              <button v-if="formData.typography.title.color" @click="formData.typography.title.color = ''"
+                title="Reset Color to Theme Default" class="p-1 text-gray-400 hover:text-red-500">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div class="space-y-2 mt-4">
             <textarea v-model="formData.description"
               class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-[#5855F6] outline-none transition-all h-20 resize-none"
               placeholder="Internal description..."></textarea>
+
+            <div v-if="formData.typography"
+              class="flex items-center gap-1 p-1 bg-gray-50 border border-gray-200 rounded-md shadow-sm">
+              <button @click="toggleStyle('description', 'weight', 'bold', 'normal')"
+                :class="formData.typography.description.weight === 'bold' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Bold">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 12a4 4 0 0 0 0-8H6v8" />
+                  <path d="M15 20a4 4 0 0 0 0-8H6v8Z" />
+                </svg>
+              </button>
+              <button @click="toggleStyle('description', 'style', 'italic', 'normal')"
+                :class="formData.typography.description.style === 'italic' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Italic">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="4" x2="10" y2="4" />
+                  <line x1="14" y1="20" x2="5" y2="20" />
+                  <line x1="15" y1="4" x2="9" y2="20" />
+                </svg>
+              </button>
+              <button @click="toggleStyle('description', 'decoration', 'underline', 'none')"
+                :class="formData.typography.description.decoration === 'underline' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Underline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
+                  <line x1="4" y1="21" x2="20" y2="21" />
+                </svg>
+              </button>
+
+              <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+              <button @click="formData.typography.description.align = 'left'"
+                :class="formData.typography.description.align === 'left' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                  <line x1="17" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+              <button @click="formData.typography.description.align = 'center'"
+                :class="formData.typography.description.align === 'center' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <line x1="21" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+              <button @click="formData.typography.description.align = 'right'"
+                :class="formData.typography.description.align === 'right' ? 'bg-white shadow text-[#5855F6]' : 'text-gray-500 hover:bg-gray-200'"
+                class="p-1.5 rounded transition-all" title="Align Right">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="6" x2="3" y2="6" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                  <line x1="21" y1="18" x2="3" y2="18" />
+                </svg>
+              </button>
+
+              <div class="w-px h-4 bg-gray-300 mx-1"></div>
+
+              <div
+                class="relative flex items-center justify-center w-6 h-6 rounded cursor-pointer overflow-hidden border border-gray-200 ml-1"
+                title="Text Color">
+                <input type="color" v-model="formData.typography.description.color"
+                  class="absolute -inset-2 w-10 h-10 cursor-pointer" />
+              </div>
+              <button v-if="formData.typography.description.color" @click="formData.typography.description.color = ''"
+                title="Reset Color to Theme Default" class="p-1 text-gray-400 hover:text-red-500">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -139,16 +309,8 @@
         <div v-else-if="formLoaded" :style="activeThemeStyle"
           class="w-full max-w-2xl shadow-xl shadow-gray-200/50 rounded-xl min-h-[800px] border border-[var(--tpl-border)] bg-[var(--tpl-bg)] text-[var(--tpl-text)] relative flex flex-col animate-fade-up transition-colors duration-500 overflow-hidden">
 
-          <!-- Intelligent View Badge -->
-          <!-- <div
-            class="absolute top-0 right-4 sm:right-8 -translate-y-1/2 px-3 py-1 text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-md flex items-center gap-1.5 z-20"
-            style="background-color: var(--tpl-primary);">
-            <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Studio View
-          </div> -->
-
           <!-- Paper Header -->
           <div class="p-6 sm:p-10 pb-6 border-b border-[var(--tpl-border)] flex-shrink-0 relative">
-            <!-- 🌟 NEW: Direct link display inside paper -->
             <div class="absolute top-4 right-4 cursor-pointer group" @click="copyShareLink"
               title="Click to copy live link">
               <span
@@ -157,12 +319,28 @@
               </span>
             </div>
 
-            <input v-model="formData.title"
-              class="w-full mt-4 text-2xl sm:text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 mb-2 outline-none text-[var(--tpl-text)]"
-              placeholder="Enter Form Title..." />
-            <input v-model="formData.description"
-              class="w-full text-sm bg-transparent border-none focus:ring-0 p-0 outline-none opacity-70 text-[var(--tpl-text)]"
-              placeholder="Type a description for your users..." />
+            <!-- Dynamic Canvas Title applying typography styles -->
+            <input v-if="formData.typography" v-model="formData.title"
+              class="w-full mt-4 text-2xl sm:text-3xl bg-transparent border-none focus:ring-0 p-0 mb-2 outline-none"
+              :style="{
+                color: formData.typography.title.color || 'var(--tpl-text)',
+                textAlign: formData.typography.title.align,
+                textDecoration: formData.typography.title.decoration,
+                fontWeight: formData.typography.title.weight,
+                fontStyle: formData.typography.title.style
+              }" placeholder="Enter Form Title..." />
+
+            <!-- Dynamic Canvas Description applying typography styles -->
+            <textarea v-if="formData.typography" v-model="formData.description"
+              class="w-full text-[15px] bg-transparent border-none focus:ring-0 p-0 outline-none resize-none overflow-hidden"
+              :style="{
+                color: formData.typography.description.color || 'var(--tpl-text)',
+                textAlign: formData.typography.description.align,
+                textDecoration: formData.typography.description.decoration,
+                fontWeight: formData.typography.description.weight,
+                fontStyle: formData.typography.description.style,
+                opacity: formData.typography.description.color ? 1 : 0.75
+              }" rows="2" placeholder="Type a description for your users..."></textarea>
           </div>
 
           <!-- Canvas Drop Area Container -->
@@ -215,8 +393,11 @@
 
                 <!-- Field Content (Mock UI) -->
                 <div class="flex-1 flex flex-col gap-1.5 pointer-events-none min-w-0">
-                  <label class="text-sm font-bold truncate" style="color: var(--tpl-text);">{{ element.label ||
-                    "Untitled Field" }}</label>
+                  <label class="text-sm font-bold truncate" style="color: var(--tpl-text);">
+                    {{ element.label || "Untitled Field" }}
+                    <!-- 🌟 NEW: Render red asterisk if field is marked required -->
+                    <span v-if="element.required" class="text-red-500 ml-1">*</span>
+                  </label>
 
                   <div class="px-3 py-2 border rounded-md text-sm truncate flex items-center opacity-70"
                     style="background-color: color-mix(in srgb, var(--tpl-text) 5%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);">
@@ -265,7 +446,8 @@
           </svg>
           <h2 class="text-xl font-bold text-gray-900 mb-2">Instance Not Found</h2>
           <p class="text-gray-500 mb-6">{{ errorMessage || "Could not find a valid form ID." }}</p>
-          <router-link to="/workspace" class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
+          <router-link :to="$router.go(-1)"
+            class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
             to
             Hub</router-link>
         </div>
@@ -334,6 +516,20 @@
                 </div>
               </div>
             </div>
+
+            <!-- 🌟 NEW: Required Field Toggle Switch -->
+            <div class="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
+              <label class="text-[11px] font-bold text-gray-500 uppercase tracking-widest cursor-pointer"
+                @click="activeField.required = !activeField.required">
+                Required Field
+              </label>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" v-model="activeField.required" class="sr-only peer">
+                <div
+                  class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#5855F6]">
+                </div>
+              </label>
+            </div>
           </div>
 
           <div v-if="['select', 'radio'].includes(activeField.type)" class="mt-8 pt-6 border-t border-gray-100">
@@ -401,7 +597,11 @@ const formData = ref({
   _id: "",
   title: "",
   description: "",
-  template_id: "minimal-light", // Default Theme
+  template_id: "minimal-light",
+  typography: {
+    title: { align: "left", color: "", decoration: "none", weight: "bold", style: "normal", size: "" },
+    description: { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" }
+  },
   schema: [],
 });
 
@@ -422,12 +622,20 @@ const activeThemeStyle = computed(() => {
   };
 });
 
+// Toolbar function to toggle rich text styles
+const toggleStyle = (element, property, activeValue, inactiveValue) => {
+  if (formData.value.typography[element][property] === activeValue) {
+    formData.value.typography[element][property] = inactiveValue;
+  } else {
+    formData.value.typography[element][property] = activeValue;
+  }
+};
+
 // --- Lifecycle & Fetching ---
 onMounted(async () => {
   const storedUserStr = localStorage.getItem("user");
   if (storedUserStr) currentUser.value = JSON.parse(storedUserStr);
 
-  // Fetch Allowed Templates based on user
   if (currentUser.value) {
     try {
       const templateRes = await axios.get(`http://localhost:3000/api/templateRouter?userId=${currentUser.value._id}`);
@@ -458,8 +666,17 @@ const fetchForm = async () => {
     const response = await axios.get(`http://localhost:3000/api/forms/${currentFormId.value}`);
     formData.value = response.data;
 
-    // Ensure template_id is initialized if it's missing from DB
     if (!formData.value.template_id) formData.value.template_id = "minimal-light";
+
+    if (!formData.value.typography) {
+      formData.value.typography = {
+        title: { align: "left", color: "", decoration: "none", weight: "bold", style: "normal", size: "" },
+        description: { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" }
+      };
+    } else {
+      if (!formData.value.typography.title) formData.value.typography.title = { align: "left", color: "", decoration: "none", weight: "bold", style: "normal", size: "" };
+      if (!formData.value.typography.description) formData.value.typography.description = { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" };
+    }
 
     if (!Array.isArray(formData.value.schema)) formData.value.schema = [];
     formLoaded.value = true;
@@ -472,12 +689,10 @@ const fetchForm = async () => {
   }
 };
 
-// 🌟 NEW: Copy Link Function
 const copyShareLink = () => {
   if (!currentFormId.value) return;
-  const link = `${window.location.origin}/preview/f/${currentFormId.value}`;
+  const link = `${window.location.origin}/public/${currentFormId.value}`;
 
-  // Safe way to copy to clipboard handling iframe limitations
   const el = document.createElement('textarea');
   el.value = link;
   document.body.appendChild(el);
@@ -498,6 +713,7 @@ const saveChanges = async () => {
       description: formData.value.description,
       template_id: formData.value.template_id,
       schema: formData.value.schema,
+      typography: formData.value.typography
     });
     successMessage.value = "Saved successfully!";
     setTimeout(() => { successMessage.value = ""; }, 3000);
@@ -508,24 +724,24 @@ const saveChanges = async () => {
   }
 };
 
-// ... Drag & Drop, Field Types, and getFieldIcon logic below remains exactly the same
 const draggedIndex = ref(null);
 const activeField = computed(() => {
   if (activeFieldIndex.value === null) return null;
   return formData.value.schema[activeFieldIndex.value];
 });
 
+// 🌟 UPDATED: Set default required states for palette elements
 const paletteElements = [
-  { type: "text", label: "Short Text", placeholder: "Type text here..." },
-  { type: "textarea", label: "Long Text", placeholder: "Type paragraph here..." },
-  { type: "email", label: "Email Address", placeholder: "email@example.com" },
-  { type: "number", label: "Number", placeholder: "0" },
-  { type: "select", label: "Dropdown", options: ["Option 1", "Option 2"] },
-  { type: "radio", label: "Radio Buttons", options: ["Option 1", "Option 2"] },
-  { type: "checkbox", label: "Checkbox", placeholder: "Check me" },
-  { type: "date", label: "Date Picker", placeholder: "" },
-  { type: "file", label: "File Upload", placeholder: "" },
-  { type: "color", label: "Color Picker", placeholder: "" },
+  { type: "text", label: "Short Text", placeholder: "Type text here...", required: false },
+  { type: "textarea", label: "Long Text", placeholder: "Type paragraph here...", required: false },
+  { type: "email", label: "Email Address", placeholder: "email@example.com", required: true },
+  { type: "number", label: "Number", placeholder: "0", required: false },
+  { type: "select", label: "Dropdown", options: ["Option 1", "Option 2"], required: false },
+  { type: "radio", label: "Radio Buttons", options: ["Option 1", "Option 2"], required: false },
+  { type: "checkbox", label: "Checkbox", placeholder: "Check me", required: false },
+  { type: "date", label: "Date Picker", placeholder: "", required: false },
+  { type: "file", label: "File Upload", placeholder: "", required: false },
+  { type: "color", label: "Color Picker", placeholder: "", required: false },
 ];
 
 const cloneElement = (element) => {

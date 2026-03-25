@@ -1,173 +1,230 @@
 <template>
-  <div class="min-h-screen bg-[#F8FAFF] py-12 px-4 sm:px-6   flex justify-center items-start">
+  <!-- Main Wrapper with dynamic background color & font -->
+  <div class="min-h-screen py-12 px-4 sm:px-6 flex justify-center items-start transition-colors duration-500"
+    :style="activeThemeStyle" style="background-color: color-mix(in srgb, var(--tpl-bg) 95%, var(--tpl-text));">
 
-    <!-- Loading State -->
-    <div v-if="isLoading" class="flex flex-col items-center justify-center pt-20">
-      <svg class="animate-spin h-10 w-10 text-theme-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 24 24">
+    <!-- 1. Loading State -->
+    <div v-if="isLoading" class="flex flex-col items-center justify-center pt-32">
+      <svg class="animate-spin h-10 w-10 mb-4" style="color: var(--tpl-primary);" xmlns="http://www.w3.org/2000/svg"
+        fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor"
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
         </path>
       </svg>
-      <p class="text-theme-muted font-medium">Loading form...</p>
+      <p class="font-medium" style="color: var(--tpl-text); opacity: 0.7;">Loading form...</p>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="errorMessage"
-      class="max-w-xl w-full bg-white p-10 rounded-2xl shadow-sm border border-red-100 text-center mt-10">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-theme-error mx-auto mb-4 opacity-80" fill="none"
-        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <!-- 2. Error / Not Found State -->
+    <div v-else-if="errorMessage" class="max-w-xl w-full p-10 rounded-2xl shadow-xl text-center mt-20"
+      style="background-color: var(--tpl-bg); border: 1px solid var(--tpl-border);">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" style="color: var(--tpl-text);"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <h2 class="text-xl font-bold text-gray-900 mb-2">Form Unavailable</h2>
-      <p class="text-theme-muted">{{ errorMessage }}</p>
+      <h2 class="text-2xl font-bold mb-2" style="color: var(--tpl-text);">Form Unavailable</h2>
+      <p style="color: var(--tpl-text); opacity: 0.7;">{{ errorMessage }}</p>
     </div>
 
-    <!-- Success / Thank You State -->
-    <div v-else-if="isSubmitted"
-      class="max-w-xl w-full bg-white p-12 rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 text-center mt-10 animate-fade-up">
-      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-theme-success">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+    <!-- 3. Success / Thank You State -->
+    <div v-else-if="isSubmitted" class="max-w-xl w-full p-12 rounded-2xl shadow-2xl text-center mt-20 animate-fade-up"
+      style="background-color: var(--tpl-bg); border: 1px solid var(--tpl-border);">
+      <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+        style="background-color: color-mix(in srgb, var(--tpl-primary) 15%, transparent); color: var(--tpl-primary);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
             clip-rule="evenodd" />
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-3">Thank you!</h2>
-      <p class="text-theme-muted mb-8">Your response has been successfully recorded.</p>
+      <h2 class="text-3xl font-bold mb-3" style="color: var(--tpl-text);">Thank you!</h2>
+      <p class="mb-8 text-lg" style="color: var(--tpl-text); opacity: 0.7;">Your response has been successfully
+        recorded.</p>
       <button @click="resetForm"
-        class="px-6 py-2.5 bg-gray-50 text-gray-600 font-bold rounded-lg hover:bg-gray-100 transition-colors">
+        class="px-8 py-3 font-bold rounded-xl transition-transform hover:-translate-y-0.5 shadow-md"
+        style="background-color: var(--tpl-primary); color: #ffffff;">
         Submit another response
       </button>
     </div>
 
-    <!-- Form Rendering State -->
-    <div v-else
-      class="max-w-2xl w-full bg-white p-8 sm:p-12 rounded-[32px] shadow-xl shadow-gray-200/50 border border-gray-100 mt-6 animate-fade-up">
+    <!-- 4. Main Form Area -->
+    <div v-else class="max-w-3xl w-full bg-[var(--tpl-bg)] rounded-2xl shadow-2xl overflow-hidden mt-6 animate-fade-up">
 
-      <!-- Form Header -->
-      <div class="mb-8 border-b border-gray-100 pb-8">
-        <h1 class="text-3xl sm:text-4xl font-bold text-theme-text mb-3 leading-tight">{{ formData.title }}</h1>
-        <p class="text-theme-muted text-[15px] leading-relaxed">{{ formData.description }}</p>
-      </div>
+      <!-- Top Accent Bar -->
+      <div class="h-3 w-full" style="background-color: var(--tpl-primary);"></div>
 
-      <!-- Form Body -->
-      <form @submit.prevent="submitForm" class="space-y-6">
-        <div v-for="field in formData.schema" :key="field.id" class="flex flex-col">
-          <label class="mb-2 text-[14px] font-bold text-gray-700">{{ field.label }}</label>
-
-          <!-- 1. Standard Inputs (text, email, number, password, date, time, url, tel) -->
-          <input
-            v-if="['text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'url', 'tel'].includes(field.type)"
-            :type="field.type" :placeholder="field.placeholder" v-model="answers[field.id]" required
-            class="px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5855F6]/20 focus:border-[#5855F6] focus:bg-white transition-all text-[15px] text-gray-800 w-full" />
-
-          <!-- 2. Textarea -->
-          <textarea v-else-if="field.type === 'textarea'" :placeholder="field.placeholder" v-model="answers[field.id]"
-            required rows="4"
-            class="px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5855F6]/20 focus:border-[#5855F6] focus:bg-white transition-all text-[15px] text-gray-800 w-full resize-y"></textarea>
-
-          <!-- 3. Select Dropdown -->
-          <select v-else-if="field.type === 'select'" v-model="answers[field.id]" required
-            class="px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5855F6]/20 focus:border-[#5855F6] focus:bg-white transition-all text-[15px] text-gray-800 w-full cursor-pointer">
-            <option disabled value="">Select an option...</option>
-            <option v-for="opt in field.options" :key="opt" :value="opt">{{ opt }}</option>
-          </select>
-
-          <!-- 4. Radio Buttons -->
-          <div v-else-if="field.type === 'radio'" class="space-y-3 mt-1">
-            <label v-for="opt in field.options" :key="opt"
-              class="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-              :class="{ 'border-[#5855F6] bg-[#5855F6]/5': answers[field.id] === opt }">
-              <input type="radio" :name="'radio-' + field.id" :value="opt" v-model="answers[field.id]" required
-                class="w-4 h-4 text-[#5855F6] focus:ring-[#5855F6] border-gray-300" />
-              <span class="text-[15px] text-gray-700 font-medium">{{ opt }}</span>
-            </label>
-          </div>
-
-          <!-- 5. Checkbox -->
-          <label v-else-if="field.type === 'checkbox'" class="flex items-center gap-3 cursor-pointer mt-1 group w-fit">
-            <div class="relative flex items-center justify-center">
-              <input type="checkbox" v-model="answers[field.id]"
-                class="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#5855F6]/20 checked:bg-[#5855F6] checked:border-[#5855F6] transition-all cursor-pointer" />
-              <svg
-                class="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
-                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-            <span
-              class="text-[15px] text-gray-700 font-medium select-none group-hover:text-gray-900 transition-colors">{{
-                field.placeholder || 'Yes, I agree' }}</span>
-          </label>
-
-          <!-- 🌟 6. Color Picker -->
-          <div v-else-if="field.type === 'color'" class="flex items-center gap-4 mt-1">
-            <input type="color" v-model="answers[field.id]" required
-              class="h-12 w-20 p-1 cursor-pointer bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5855F6]/20 transition-all" />
-            <span
-              class="text-sm font-mono text-gray-500 uppercase bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">{{
-                answers[field.id] || '#000000' }}</span>
-          </div>
-
-          <!-- 🌟 7. Range Slider -->
-          <div v-else-if="field.type === 'range'"
-            class="flex items-center gap-4 mt-2 bg-gray-50/50 border border-gray-200 p-4 rounded-xl">
-            <input type="range" v-model="answers[field.id]" required
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#5855F6]" />
-            <span class="text-sm font-bold text-white bg-[#5855F6] px-3 py-1 rounded-md w-12 text-center">{{
-              answers[field.id] || 50 }}</span>
-          </div>
-
-          <!-- 🌟 8. File Upload -->
-          <div v-else-if="field.type === 'file'" class="mt-1">
-            <input type="file" @change="(e) => handleFileUpload(e, field.id)" required
-              class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-[14px] text-gray-500 
-                     file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold 
-                     file:bg-[#5855F6]/10 file:text-[#5855F6] hover:file:bg-[#5855F6]/20 transition-all cursor-pointer" />
-          </div>
-
-          <!-- Fallback -->
-          <input v-else type="text" :placeholder="field.placeholder" v-model="answers[field.id]" required
-            class="px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5855F6]/20 focus:border-[#5855F6] transition-all text-[15px] text-gray-800 w-full" />
-
+      <div class="p-8 sm:p-12">
+        <!-- 🌟 Form Header with Dynamic Typography! -->
+        <div class="mb-10 pb-8 border-b" style="border-color: var(--tpl-border);">
+          <h1 class="text-3xl sm:text-4xl font-bold mb-4 leading-tight" :style="{
+            color: formData.typography?.title?.color || 'var(--tpl-text)',
+            textAlign: formData.typography?.title?.align || 'left',
+            textDecoration: formData.typography?.title?.decoration || 'none',
+            fontWeight: formData.typography?.title?.weight || 'bold',
+            fontStyle: formData.typography?.title?.style || 'normal'
+          }">
+            {{ formData.title }}
+          </h1>
+          <p class="text-[16px] leading-relaxed whitespace-pre-wrap" :style="{
+            color: formData.typography?.description?.color || 'var(--tpl-text)',
+            textAlign: formData.typography?.description?.align || 'left',
+            textDecoration: formData.typography?.description?.decoration || 'none',
+            fontWeight: formData.typography?.description?.weight || 'normal',
+            fontStyle: formData.typography?.description?.style || 'normal',
+            opacity: formData.typography?.description?.color ? 1 : 0.75
+          }">
+            {{ formData.description }}
+          </p>
         </div>
 
-        <button type="submit" :disabled="isSubmitting"
-          class="w-full mt-8 px-6 py-4 bg-[#5855F6] text-white font-bold text-[16px] rounded-xl hover:bg-[#4338CA] transition-all shadow-md shadow-[#5855F6]/20 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 flex justify-center items-center gap-2">
-          <svg v-if="isSubmitting" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-            viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-            </path>
-          </svg>
-          {{ isSubmitting ? 'Submitting...' : 'Submit Response' }}
-        </button>
-      </form>
+        <!-- Form Body -->
+        <form @submit.prevent="submitForm" class="space-y-8">
+          <div v-for="field in formData.schema" :key="field.id" class="flex flex-col">
+            <label class="mb-2.5 text-[15px] font-bold" style="color: var(--tpl-text);">
+              {{ field.label }}
+              <!-- 🌟 Show Red Asterisk ONLY if required is true -->
+              <span v-if="field.required" class="text-red-500 ml-1">*</span>
+            </label>
 
-      <!-- Footer Branding -->
-      <div class="mt-10 pt-6 border-t border-gray-100 text-center">
-        <a href="/"
-          class="text-[12px] font-bold text-gray-400 hover:text-[#5855F6] transition-colors flex items-center justify-center gap-1.5">
-          <svg width="12" height="12" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="currentColor" />
-            <circle cx="16" cy="16" r="6" fill="white" />
-          </svg>
-          Powered by លំហ.AI Form
-        </a>
+            <!-- 1. Standard Inputs -->
+            <input
+              v-if="['text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'url', 'tel'].includes(field.type)"
+              :type="field.type" :placeholder="field.placeholder" v-model="answers[field.id]" :required="field.required"
+              class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full"
+              style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
+              :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`" />
+
+            <!-- 2. Textarea -->
+            <textarea v-else-if="field.type === 'textarea'" :placeholder="field.placeholder" v-model="answers[field.id]"
+              :required="field.required" rows="4"
+              class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full resize-y"
+              style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
+              :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`"></textarea>
+
+            <!-- 3. Select Dropdown -->
+            <div v-else-if="field.type === 'select'" class="relative">
+              <select v-model="answers[field.id]" :required="field.required"
+                class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full cursor-pointer appearance-none"
+                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
+                :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`">
+                <option disabled value="">Select an option...</option>
+                <option v-for="opt in field.options" :key="opt" :value="opt">{{ opt }}</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4"
+                style="color: var(--tpl-text); opacity: 0.5;">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- 4. Radio Buttons -->
+            <div v-else-if="field.type === 'radio'" class="space-y-3 mt-1">
+              <label v-for="opt in field.options" :key="opt"
+                class="flex items-center gap-3 cursor-pointer p-4 border rounded-xl transition-all hover:-translate-y-0.5 shadow-sm"
+                :style="answers[field.id] === opt ? 'border-color: var(--tpl-primary); background-color: color-mix(in srgb, var(--tpl-primary) 5%, transparent);' : 'border-color: var(--tpl-border); background-color: var(--tpl-bg);'">
+                <input type="radio" :name="'radio-' + field.id" :value="opt" v-model="answers[field.id]"
+                  :required="field.required" class="w-5 h-5 border"
+                  style="accent-color: var(--tpl-primary); border-color: var(--tpl-border);" />
+                <span class="text-[16px] font-medium" style="color: var(--tpl-text);">{{ opt }}</span>
+              </label>
+            </div>
+
+            <!-- 5. Checkbox -->
+            <label v-else-if="field.type === 'checkbox'"
+              class="flex items-center gap-3 cursor-pointer mt-1 group w-fit">
+              <div class="relative flex items-center justify-center">
+                <input type="checkbox" v-model="answers[field.id]" :required="field.required"
+                  class="peer appearance-none w-6 h-6 border-2 rounded transition-all cursor-pointer"
+                  style="border-color: var(--tpl-border); accent-color: var(--tpl-primary);" />
+                <div
+                  class="absolute inset-0 rounded pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity flex items-center justify-center"
+                  style="background-color: var(--tpl-primary);">
+                  <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <span class="text-[16px] font-medium select-none transition-colors opacity-90 hover:opacity-100"
+                style="color: var(--tpl-text);">
+                {{ field.placeholder || 'Yes, I agree' }}
+              </span>
+            </label>
+
+            <!-- 6. Color Picker -->
+            <div v-else-if="field.type === 'color'" class="flex items-center gap-4 mt-1">
+              <input type="color" v-model="answers[field.id]" :required="field.required"
+                class="h-14 w-24 p-1 cursor-pointer border rounded-xl focus:outline-none focus:ring-2 transition-all"
+                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border);"
+                :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`" />
+              <span class="text-md font-mono uppercase px-4 py-2 rounded-lg border opacity-80"
+                style="border-color: var(--tpl-border); color: var(--tpl-text);">
+                {{ answers[field.id] || '#000000' }}
+              </span>
+            </div>
+
+            <!-- 7. Range Slider -->
+            <div v-else-if="field.type === 'range'" class="flex items-center gap-5 mt-2 border p-5 rounded-xl shadow-sm"
+              style="background-color: var(--tpl-bg); border-color: var(--tpl-border);">
+              <input type="range" v-model="answers[field.id]" :required="field.required"
+                class="w-full h-2.5 rounded-lg appearance-none cursor-pointer"
+                style="background-color: color-mix(in srgb, var(--tpl-text) 15%, transparent); accent-color: var(--tpl-primary);" />
+              <span class="text-sm font-bold text-white px-4 py-1.5 rounded-md w-14 text-center"
+                style="background-color: var(--tpl-primary);">
+                {{ answers[field.id] || 50 }}
+              </span>
+            </div>
+
+            <!-- 8. File Upload -->
+            <div v-else-if="field.type === 'file'" class="mt-1">
+              <input type="file" @change="(e) => handleFileUpload(e, field.id)" :required="field.required"
+                class="w-full px-5 py-4 border rounded-xl text-[15px] transition-all cursor-pointer"
+                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);" />
+            </div>
+
+          </div>
+
+          <button type="submit" :disabled="isSubmitting"
+            class="w-full mt-10 py-4 text-white font-bold text-[18px] rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 flex justify-center items-center gap-3"
+            style="background-color: var(--tpl-primary);">
+            <svg v-if="isSubmitting" class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Form' }}
+          </button>
+        </form>
       </div>
-
     </div>
+
+    <!-- Footer Branding -->
+    <div v-if="!isLoading && !errorMessage" class="mt-12 mb-8 text-center w-full max-w-3xl">
+      <a href="/"
+        class="text-[13px] font-bold opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
+        style="color: var(--tpl-text);">
+        <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="currentColor" />
+          <circle cx="16" cy="16" r="6" fill="var(--tpl-bg)" />
+        </svg>
+        Powered by លំហ.AI Form
+      </a>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 // State
 const formId = ref("");
@@ -180,12 +237,43 @@ const isSubmitted = ref(false);
 // Stores user's answers. Key = field.id, Value = user input
 const answers = ref({});
 
-onMounted(() => {
-  // Grab ID from URL path (e.g. /f/1234 or /preview/1234)
-  const pathParts = window.location.pathname.split("/").filter(Boolean);
-  const targetId = pathParts[pathParts.length - 1]; // Assume last segment is ID
+// Hardcoded robust dictionary ensures fast loading on public endpoints
+const templates = [
+  { id: "minimal-light", colors: { primary: "#5855F6", bg: "#FFFFFF", text: "#0F172A", border: "#E2E8F0" }, font: "Inter" },
+  { id: "classic-blue", colors: { primary: "#2563EB", bg: "#F8FAFC", text: "#1E293B", border: "#CBD5E1" }, font: "Roboto" },
+  { id: "nature-green", colors: { primary: "#10B981", bg: "#F0FDF4", text: "#064E3B", border: "#A7F3D0" }, font: "Inter" },
+  { id: "warm-orange", colors: { primary: "#F59E0B", bg: "#FFFBEB", text: "#78350F", border: "#FDE68A" }, font: "Lora" },
+  { id: "soft-pink", colors: { primary: "#EC4899", bg: "#FDF2F8", text: "#831843", border: "#FBCFE8" }, font: "Inter" },
+  { id: "dark-knight", colors: { primary: "#818CF8", bg: "#0F172A", text: "#F8FAFC", border: "#334155" }, font: "Inter" },
+  { id: "elegant-serif", colors: { primary: "#0F172A", bg: "#FAFAFA", text: "#171717", border: "#E5E5E5" }, font: "Lora" },
+  { id: "neon-cyber", colors: { primary: "#22D3EE", bg: "#171717", text: "#FFFFFF", border: "#22D3EE" }, font: "Roboto" },
+  { id: "corporate-slate", colors: { primary: "#334155", bg: "#E2E8F0", text: "#0F172A", border: "#94A3B8" }, font: "Inter" },
+  { id: "midnight-purple", colors: { primary: "#C084FC", bg: "#2E1065", text: "#FAF5FF", border: "#5B21B6" }, font: "Inter" },
+  { id: "enterprise-gold", colors: { primary: "#EAB308", bg: "#000000", text: "#FFFFFF", border: "#CA8A04" }, font: "Inter" },
+  { id: "custom-brand-kit", colors: { primary: "#111827", bg: "#FFFFFF", text: "#111827", border: "#D1D5DB" }, font: "Inter" }
+];
 
-  if (targetId && targetId !== 'f' && targetId !== 'preview') {
+// 🌟 Compute Dynamic CSS Variables based on the form's saved theme
+const activeThemeStyle = computed(() => {
+  if (!formData.value) return { '--tpl-bg': '#F8FAFF', '--tpl-text': '#0F172A', '--tpl-primary': '#5855F6' };
+
+  const themeId = formData.value.template_id || 'minimal-light';
+  const theme = templates.find(t => t.id === themeId) || templates[0];
+
+  return {
+    '--tpl-primary': theme.colors?.primary || '#5855F6',
+    '--tpl-bg': theme.colors?.bg || '#FFFFFF',
+    '--tpl-text': theme.colors?.text || '#0F172A',
+    '--tpl-border': theme.colors?.border || '#E2E8F0',
+    fontFamily: theme.font === 'custom' ? 'Inter, sans-serif' : `"${theme.font}", sans-serif`
+  };
+});
+
+onMounted(() => {
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const targetId = pathParts[pathParts.length - 1];
+
+  if (targetId && targetId !== 'f' && targetId !== 'preview' && targetId !== 'public') {
     formId.value = targetId;
     fetchForm();
   } else {
@@ -197,16 +285,26 @@ onMounted(() => {
 const fetchForm = async () => {
   try {
     const response = await axios.get(`http://localhost:3000/api/forms/${formId.value}`);
-    formData.value = response.data;
+    const data = response.data;
+
+    // Safety check for older forms that might not have typography saved yet
+    if (!data.typography) {
+      data.typography = {
+        title: { align: "left", color: "", decoration: "none", weight: "bold", style: "normal", size: "" },
+        description: { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" }
+      };
+    }
+
+    formData.value = data;
 
     // Initialize answers object based on type
     formData.value.schema.forEach(field => {
       if (field.type === 'checkbox') {
         answers.value[field.id] = false;
       } else if (field.type === 'color') {
-        answers.value[field.id] = "#000000"; // Default color
+        answers.value[field.id] = "#000000";
       } else if (field.type === 'range') {
-        answers.value[field.id] = 50; // Default range value
+        answers.value[field.id] = 50;
       } else {
         answers.value[field.id] = "";
       }
@@ -218,12 +316,9 @@ const fetchForm = async () => {
   }
 };
 
-// Handle file uploads specifically since v-model doesn't work on input type="file"
 const handleFileUpload = (event, fieldId) => {
   const file = event.target.files[0];
   if (file) {
-    // In a real app, you might upload this file to S3/AWS immediately 
-    // or append it to a FormData object during submission
     answers.value[fieldId] = file.name;
   }
 };
@@ -232,13 +327,11 @@ const submitForm = async () => {
   isSubmitting.value = true;
 
   try {
-    // Note: You will eventually need a backend route (POST /api/submissions) to save this data!
     console.log("Submitting payload:", {
       form_id: formData.value._id,
       answers: answers.value
     });
 
-    // Fake network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     isSubmitted.value = true;
@@ -250,10 +343,21 @@ const submitForm = async () => {
 };
 
 const resetForm = () => {
-  // Clear answers
   Object.keys(answers.value).forEach(key => {
     answers.value[key] = typeof answers.value[key] === 'boolean' ? false : "";
   });
   isSubmitted.value = false;
 };
 </script>
+
+<style scoped>
+/* Reset color inputs for a cleaner cross-browser look */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+</style>

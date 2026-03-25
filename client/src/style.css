@@ -108,7 +108,7 @@ body {
 
   /* --- HERO SECTION --- */
   .hero-container {
-    @apply w-full min-h-screen lg:min-h-[850px] py-20 px-5 bg-[#f0f4ff] flex items-center overflow-hidden;
+    @apply w-full min-h-screen lg:min-h-[950px]  px-5 bg-[#f0f4ff] flex items-center overflow-hidden;
   }
 
   .hero-wrapper {

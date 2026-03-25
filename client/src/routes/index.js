@@ -9,6 +9,7 @@ import PreviewForm from "../pages/PreviewForm.vue";
 import Template from "../pages/Template.vue";
 import Teams from "../pages/Teams.vue";
 import RequestQuote from "../pages/RequestQuote.vue";
+import PublicForm from "../pages/PublicForm.vue";
 // auth
 import Register from "../pages/Register.vue";
 import Login from "../pages/Login.vue";
@@ -52,6 +53,11 @@ const routes = [
     path: "/preview/f/:id",
     name: "preview",
     component: PreviewForm,
+  },
+  {
+    path: "/public/:id",
+    name: "public",
+    component: PublicForm
   },
   {
     path: "/template",

@@ -1,17 +1,16 @@
 <template>
-  <div class="relative">
+  <div class="bg-[#f0f4ff]">
     <Navbar />
 
     <!-- Top Scroll Blur Effect -->
     <div class="scroll-fade-blur"></div>
 
-    <div id="features"
-      class="relative animate-fade-up animate-once animate-duration-500 animate-delay-300 animate-ease-out">
+    <div id="features" class=" animate-fade-up animate-once animate-duration-500 animate-delay-300 animate-ease-out">
       <HeroPage />
       <Collapse id="collaborate" />
       <Features id="features" />
       <CollapseUser />
-      <!-- <PricingComponent id="pricing" />  -->
+      <Template />
       <CTA id="cta" />
       <Footer />
     </div>
@@ -43,6 +42,7 @@ import Collapse from "./Collapse.vue";
 import Navbar from "./Navbar.vue";
 import Features from "./Features.vue";
 import CollapseUser from "./CollapseUser.vue";
+import Template from "./Template.vue";
 // import PricingComponent from "./PricingComponent.vue";
 import CTA from "./CTA.vue";
 import Footer from "./Footer.vue";
