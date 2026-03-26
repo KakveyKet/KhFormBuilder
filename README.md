@@ -1,17 +1,30 @@
 Sure! Here's a simple and ready-to-copy **README** for your project:
 
 ---
-
 # KhFormBuilder
 
-KhFormBuilder is a Vue.js-based form builder that allows you to easily create and manage forms with minimal code. It features drag-and-drop functionality and the ability to export forms as JSON.
+**KhFormBuilder** is an open-source, customizable form builder that allows users to create dynamic forms with ease. This project provides a flexible and user-friendly interface for building and managing forms, complete with validation, drag-and-drop features, and more.
+
+![KhFormBuilder Screenshot](https://res.cloudinary.com/dvljcimlz/image/upload/v1774512632/screencapture-localhost-5173-2026-03-25-09_31_17_woocdn.png)
+
+## Table of Contents
+- [Description](#description)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Description
+KhFormBuilder is designed to help users quickly create and manage forms without needing to write a lot of code. Whether you need a simple contact form or a complex survey form, this tool provides the necessary components for customization. It's built using **Vue.js** for the frontend and **Node.js** for the backend.
 
 ## Features
-
-* Drag-and-drop form builder
-* Customizable fields (text, number, date, etc.)
-* JSON export of form data
-* Dynamic rendering with real-time updates
+- **Drag-and-Drop Interface**: Easily arrange form fields with drag-and-drop.
+- **Field Types**: Supports text fields, dropdowns, checkboxes, radio buttons, and more.
+- **Validation**: Built-in validation for required fields, email formats, etc.
+- **Customizable**: Highly customizable fields and form layouts.
+- **Save Forms**: Ability to save form data for future use or export.
+- **Dynamic Logic**: Apply conditions to show or hide form elements based on user input.
 
 ## Getting Started
 
