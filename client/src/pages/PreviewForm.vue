@@ -1,9 +1,8 @@
 <template>
-  <!-- Main Wrapper with dynamic background color & font -->
-  <div class="min-h-screen py-12 px-4 sm:px-6 flex justify-center items-start transition-colors duration-500"
-    :style="activeThemeStyle" style="background-color: color-mix(in srgb, var(--tpl-bg) 95%, var(--tpl-text));">
+  <div
+    class="min-h-screen py-12 px-4 sm:px-6 flex justify-center items-start transition-colors duration-500 form-wrapper-bg"
+    :style="activeThemeStyle">
 
-    <!-- 1. Loading State -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center pt-32">
       <svg class="animate-spin h-10 w-10 mb-4" style="color: var(--tpl-primary);" xmlns="http://www.w3.org/2000/svg"
         fill="none" viewBox="0 0 24 24">
@@ -15,7 +14,6 @@
       <p class="font-medium" style="color: var(--tpl-text); opacity: 0.7;">Loading form...</p>
     </div>
 
-    <!-- 2. Error / Not Found State -->
     <div v-else-if="errorMessage" class="max-w-xl w-full p-10 rounded-2xl shadow-xl text-center mt-20"
       style="background-color: var(--tpl-bg); border: 1px solid var(--tpl-border);">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" style="color: var(--tpl-text);"
@@ -26,7 +24,6 @@
       <p style="color: var(--tpl-text); opacity: 0.7;">{{ errorMessage }}</p>
     </div>
 
-    <!-- 3. Success / Thank You State -->
     <div v-else-if="isSubmitted" class="max-w-xl w-full p-12 rounded-2xl shadow-2xl text-center mt-20 animate-fade-up"
       style="background-color: var(--tpl-bg); border: 1px solid var(--tpl-border);">
       <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
@@ -47,7 +44,7 @@
       </button>
     </div>
 
-    <!-- 4. Main Form Area -->
+    <!-- Main Form Area -->
     <div v-else
       class="max-w-3xl w-full bg-[var(--tpl-bg)] rounded-2xl shadow-2xl overflow-hidden mt-6 animate-fade-up flex flex-col">
 
@@ -68,8 +65,7 @@
           <img v-if="formData.header_file.type === 'image'" :src="formData.header_file.url"
             class="max-h-32 object-contain rounded-lg shadow-sm border" style="border-color: var(--tpl-border);" />
           <a v-else :href="formData.header_file.url" :download="formData.header_file.name"
-            class="flex items-center gap-2 px-5 py-3 rounded-lg border text-sm font-bold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
-            style="border-color: var(--tpl-primary); color: var(--tpl-primary); background-color: color-mix(in srgb, var(--tpl-primary) 5%, transparent);">
+            class="form-header-attachment">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -107,144 +103,169 @@
 
           <!-- Step Progress Indicator -->
           <div v-if="formSteps.length > 1" class="mb-8">
-            <p class="text-sm font-bold mb-3" style="color: var(--tpl-text); opacity: 0.6;">
-              Step {{ currentStep + 1 }} of {{ formSteps.length }}
-            </p>
-            <div class="w-full rounded-full h-1.5 overflow-hidden"
+            <div class="flex items-center justify-between mb-3">
+              <h3 v-if="formSteps[currentStep].title !== formData.title" class="text-xl font-bold"
+                style="color: var(--tpl-text);">
+                {{ formSteps[currentStep].title }}
+              </h3>
+              <p class="text-sm font-bold" style="color: var(--tpl-text); opacity: 0.6;">
+                Step {{ currentStep + 1 }} of {{ formSteps.length }}
+              </p>
+            </div>
+            <div class="w-full rounded-full h-2 overflow-hidden"
               style="background-color: color-mix(in srgb, var(--tpl-text) 10%, transparent);">
-              <div class="h-1.5 rounded-full transition-all duration-300" style="background-color: var(--tpl-primary);"
+              <div class="h-2 rounded-full transition-all duration-500 ease-out"
+                style="background-color: var(--tpl-primary);"
                 :style="{ width: ((currentStep + 1) / formSteps.length * 100) + '%' }"></div>
             </div>
-            <h3 v-if="formSteps[currentStep].title !== formData.title" class="text-2xl font-bold mt-6 mb-2"
-              style="color: var(--tpl-text);">
-              {{ formSteps[currentStep].title }}
-            </h3>
           </div>
 
           <!-- Render fields for the current step -->
           <div v-for="field in formSteps[currentStep].fields" :key="field.id" class="flex flex-col">
-            <label class="mb-2.5 text-[15px] font-bold" style="color: var(--tpl-text);">
+            <label class="mb-2 text-[15px] font-bold" style="color: var(--tpl-text);">
               {{ field.label }}
-              <span v-if="field.required" class="text-red-500 ml-1">*</span>
+              <span v-if="field.required" class="text-red-500 ml-1" title="Required">*</span>
             </label>
 
-            <!-- 1. Standard Inputs -->
-            <input
-              v-if="['text', 'email', 'number', 'password', 'date', 'time', 'datetime-local', 'url', 'tel'].includes(field.type)"
-              :type="field.type" :placeholder="field.placeholder" v-model="answers[field.id]" :required="field.required"
-              class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full"
-              style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
-              :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`" />
+            <!-- 1. Standard Text Inputs -->
+            <input v-if="['text', 'email', 'number', 'password', 'url', 'tel'].includes(field.type)" :type="field.type"
+              :placeholder="field.placeholder" v-model="answers[field.id]" :required="field.required"
+              class="form-input-base" />
 
-            <!-- 2. Textarea -->
+            <!-- 2. Date & Time Inputs -->
+            <div v-else-if="['date', 'time', 'datetime-local'].includes(field.type)" class="form-date-wrapper">
+              <div
+                class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none transition-colors form-date-icon">
+                <svg v-if="field.type === 'date' || field.type === 'datetime-local'" xmlns="http://www.w3.org/2000/svg"
+                  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                  <line x1="16" x2="16" y1="2" y2="6" />
+                  <line x1="8" x2="8" y1="2" y2="6" />
+                  <line x1="3" x2="21" y1="10" y2="10" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <input :type="field.type" :placeholder="field.placeholder" v-model="answers[field.id]"
+                :required="field.required" class="form-input-base custom-date-input pl-12" />
+            </div>
+
+            <!-- 3. Textarea -->
             <textarea v-else-if="field.type === 'textarea'" :placeholder="field.placeholder" v-model="answers[field.id]"
-              :required="field.required" rows="4"
-              class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full resize-y"
-              style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
-              :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`"></textarea>
+              :required="field.required" rows="4" class="form-input-base resize-y"></textarea>
 
-            <!-- 3. Select Dropdown -->
-            <div v-else-if="field.type === 'select'" class="relative">
+            <!-- 4. Select Dropdown -->
+            <div v-else-if="field.type === 'select'" class="form-select-wrapper">
               <select v-model="answers[field.id]" :required="field.required"
-                class="px-5 py-3.5 border rounded-xl focus:outline-none focus:ring-2 transition-all text-[16px] w-full cursor-pointer appearance-none"
-                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);"
-                :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`">
+                class="form-input-base appearance-none cursor-pointer pr-10">
                 <option disabled value="">Select an option...</option>
                 <option v-for="opt in field.options" :key="opt" :value="opt">{{ opt }}</option>
               </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4"
-                style="color: var(--tpl-text); opacity: 0.5;">
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              <div
+                class="pointer-events-none absolute inset-y-0 right-4 flex items-center transition-all form-select-chevron">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
             </div>
 
-            <!-- 4. Radio Buttons -->
-            <div v-else-if="field.type === 'radio'" class="space-y-3 mt-1">
-              <label v-for="opt in field.options" :key="opt"
-                class="flex items-center gap-3 cursor-pointer p-4 border rounded-xl transition-all hover:-translate-y-0.5 shadow-sm"
-                :style="answers[field.id] === opt ? 'border-color: var(--tpl-primary); background-color: color-mix(in srgb, var(--tpl-primary) 5%, transparent);' : 'border-color: var(--tpl-border); background-color: var(--tpl-bg);'">
-                <input type="radio" :name="'radio-' + field.id" :value="opt" v-model="answers[field.id]"
-                  :required="field.required" class="w-5 h-5 border"
-                  style="accent-color: var(--tpl-primary); border-color: var(--tpl-border);" />
-                <span class="text-[16px] font-medium" style="color: var(--tpl-text);">{{ opt }}</span>
+            <!-- 5. Radio Buttons -->
+            <div v-else-if="field.type === 'radio'" class="flex flex-col gap-2 mt-2">
+              <label v-for="opt in field.options" :key="opt" class="form-radio-card"
+                :class="{ 'is-active': answers[field.id] === opt }">
+
+                <div class="form-radio-circle">
+                  <div class="form-radio-dot"></div>
+                </div>
+
+                <input type="radio" class="sr-only" :name="'radio-' + field.id" :value="opt" v-model="answers[field.id]"
+                  :required="field.required" />
+                <span class="text-[15px] font-medium" style="color: var(--tpl-text);">{{ opt }}</span>
               </label>
             </div>
 
-            <!-- 5. Checkbox -->
-            <label v-else-if="field.type === 'checkbox'"
-              class="flex items-center gap-3 cursor-pointer mt-1 group w-fit">
-              <div class="relative flex items-center justify-center">
-                <input type="checkbox" v-model="answers[field.id]" :required="field.required"
-                  class="peer appearance-none w-6 h-6 border-2 rounded transition-all cursor-pointer"
-                  style="border-color: var(--tpl-border); accent-color: var(--tpl-primary);" />
-                <div
-                  class="absolute inset-0 rounded pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity flex items-center justify-center"
-                  style="background-color: var(--tpl-primary);">
-                  <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd" />
+            <!-- 6. Checkbox -->
+            <label v-else-if="field.type === 'checkbox'" class="form-checkbox-wrapper">
+              <div class="flex items-center h-6">
+                <input type="checkbox" class="form-checkbox-input peer sr-only" v-model="answers[field.id]"
+                  :required="field.required" />
+                <div class="form-checkbox-box">
+                  <svg class="form-checkbox-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
               </div>
-              <span class="text-[16px] font-medium select-none transition-colors opacity-90 hover:opacity-100"
-                style="color: var(--tpl-text);">
-                {{ field.placeholder || 'Yes, I agree' }}
-              </span>
+              <div class="flex flex-col">
+                <span class="form-checkbox-label">
+                  {{ field.placeholder || 'Yes, I agree' }}
+                </span>
+              </div>
             </label>
 
-            <!-- 6. Color Picker -->
-            <div v-else-if="field.type === 'color'" class="flex items-center gap-4 mt-1">
-              <input type="color" v-model="answers[field.id]" :required="field.required"
-                class="h-14 w-24 p-1 cursor-pointer border rounded-xl focus:outline-none focus:ring-2 transition-all"
-                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border);"
-                :style="`--tw-ring-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent);`" />
-              <span class="text-md font-mono uppercase px-4 py-2 rounded-lg border opacity-80"
-                style="border-color: var(--tpl-border); color: var(--tpl-text);">
+            <!-- 7. Color Picker -->
+            <div v-else-if="field.type === 'color'" class="form-color-wrapper">
+              <div class="form-color-inner">
+                <input type="color" v-model="answers[field.id]" :required="field.required"
+                  class="absolute -inset-2 w-14 h-14 cursor-pointer" />
+              </div>
+              <span class="font-mono text-[15px] font-bold px-2 pr-3" style="color: var(--tpl-text);">
                 {{ answers[field.id] || '#000000' }}
               </span>
             </div>
 
-            <!-- 7. Range Slider -->
-            <div v-else-if="field.type === 'range'" class="flex items-center gap-5 mt-2 border p-5 rounded-xl shadow-sm"
-              style="background-color: var(--tpl-bg); border-color: var(--tpl-border);">
-              <input type="range" v-model="answers[field.id]" :required="field.required"
-                class="w-full h-2.5 rounded-lg appearance-none cursor-pointer"
-                style="background-color: color-mix(in srgb, var(--tpl-text) 15%, transparent); accent-color: var(--tpl-primary);" />
-              <span class="text-sm font-bold text-white px-4 py-1.5 rounded-md w-14 text-center"
-                style="background-color: var(--tpl-primary);">
+            <!-- 8. Range Slider -->
+            <div v-else-if="field.type === 'range'" class="form-range-wrapper">
+              <input type="range" v-model="answers[field.id]" :required="field.required" class="form-range-input" />
+              <div class="form-range-badge">
                 {{ answers[field.id] || 50 }}
-              </span>
+              </div>
             </div>
 
-            <!-- 8. File Upload -->
-            <div v-else-if="field.type === 'file'" class="mt-1">
-              <input type="file" @change="(e) => handleFileUpload(e, field.id)" :required="field.required"
-                class="w-full px-5 py-4 border rounded-xl text-[15px] transition-all cursor-pointer"
-                style="background-color: color-mix(in srgb, var(--tpl-text) 2%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);" />
+            <!-- 9. File Upload -->
+            <div v-else-if="field.type === 'file'">
+              <label class="form-dropzone" :class="{ 'is-active': answers[field.id] }">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                  <svg v-if="!answers[field.id]" class="form-dropzone-icon-empty" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <svg v-else class="form-dropzone-icon-filled" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+
+                  <p class="mb-1 text-sm font-bold truncate max-w-full" style="color: var(--tpl-text);">
+                    <span v-if="answers[field.id]">{{ answers[field.id] }}</span>
+                    <span v-else>Click to upload file</span>
+                  </p>
+                  <p v-if="!answers[field.id]" class="text-xs" style="color: var(--tpl-text); opacity: 0.6;">Any
+                    document or image</p>
+                </div>
+                <input type="file" class="sr-only" @change="(e) => handleFileUpload(e, field.id)"
+                  :required="field.required && !answers[field.id]" />
+              </label>
             </div>
 
           </div>
 
-          <!-- 🌟 UPDATED: Multi-step navigation buttons with Modern Icons (< and >) -->
+          <!-- Multi-step navigation buttons (< and >) -->
           <div class="flex items-center gap-4 mt-10 border-t pt-8" style="border-color: var(--tpl-border);">
-
-            <button v-if="currentStep > 0" type="button" @click="prevStep"
-              class="w-14 h-14 flex items-center justify-center font-bold rounded-xl transition-all shadow-sm hover:-translate-y-0.5 flex-shrink-0"
-              style="background-color: color-mix(in srgb, var(--tpl-text) 5%, transparent); color: var(--tpl-text);"
-              title="Previous Step">
+            <button v-if="currentStep > 0" type="button" @click="prevStep" class="form-btn-nav" title="Previous Step">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
 
-            <button v-if="currentStep < formSteps.length - 1" type="button" @click="nextStep"
-              class="flex-1 h-14 flex justify-center items-center gap-3 font-bold rounded-xl transition-all shadow-md hover:-translate-y-0.5 text-[18px]"
-              style="background-color: var(--tpl-primary); color: #ffffff;">
+            <button v-if="currentStep < formSteps.length - 1" type="button" @click="nextStep" class="form-btn-primary">
               Next
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -252,9 +273,7 @@
               </svg>
             </button>
 
-            <button v-else type="submit" :disabled="isSubmitting"
-              class="flex-1 h-14 flex justify-center items-center gap-3 text-white font-bold text-[18px] rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0"
-              style="background-color: var(--tpl-primary);">
+            <button v-else type="submit" :disabled="isSubmitting" class="form-btn-primary">
               <svg v-if="isSubmitting" class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -274,20 +293,6 @@
         </form>
       </div>
     </div>
-
-    <!-- Footer Branding -->
-    <div v-if="!isLoading && !errorMessage" class="mt-12 mb-8 text-center w-full max-w-3xl">
-      <a href="/"
-        class="text-[13px] font-bold opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
-        style="color: var(--tpl-text);">
-        <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="8" fill="currentColor" />
-          <circle cx="16" cy="16" r="6" fill="var(--tpl-bg)" />
-        </svg>
-        Powered by លំហ.AI Form
-      </a>
-    </div>
-
   </div>
 </template>
 
@@ -393,7 +398,6 @@ onMounted(() => {
 
 const fetchForm = async () => {
   try {
-    // Note: Assuming your endpoint maps to formRoutes as specified by your controller
     const response = await axios.get(`http://localhost:3000/api/formRoutes/${formId.value}`);
     const data = response.data;
 
@@ -466,14 +470,3 @@ const resetForm = () => {
   currentStep.value = 0;
 };
 </script>
-
-<style scoped>
-input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-input[type="color"]::-webkit-color-swatch {
-  border: none;
-  border-radius: 6px;
-}
-</style>
