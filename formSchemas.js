@@ -149,6 +149,70 @@ const formSchemas = {
       placeholder: "Any relevant volunteer experience?",
     },
   ],
+
+  // === NEW FORM TYPES ADDED BELOW ===
+
+  complaint: [
+    { id: 1, label: "Full Name", type: "text", placeholder: "John Doe" },
+    { id: 2, label: "Phone Number", type: "tel", placeholder: "012 345 6789" },
+    { id: 3, label: "Incident Date", type: "date" },
+    {
+      id: 4,
+      label: "Department / Category",
+      type: "select",
+      options: [
+        "Customer Service",
+        "Product Quality",
+        "Delivery Issue",
+        "Other",
+      ],
+    },
+    {
+      id: 5,
+      label: "Complaint Details",
+      type: "textarea",
+      placeholder: "Please describe the issue in detail...",
+    },
+    { id: 6, label: "Upload Proof (Optional)", type: "file" },
+  ],
+  jobApplication: [
+    { id: 1, label: "Full Name", type: "text", placeholder: "Your Full Name" },
+    { id: 2, label: "Email", type: "email", placeholder: "you@email.com" },
+    { id: 3, label: "Phone Number", type: "tel", placeholder: "012 345 6789" },
+    {
+      id: 4,
+      label: "Position Applying For",
+      type: "text",
+      placeholder: "e.g., Software Engineer",
+    },
+    { id: 5, label: "Upload Resume/CV", type: "file" },
+    {
+      id: 6,
+      label: "Cover Letter",
+      type: "textarea",
+      placeholder: "Tell us why you are a good fit...",
+    },
+  ],
+  appointmentBooking: [
+    {
+      id: 1,
+      label: "Patient/Client Name",
+      type: "text",
+      placeholder: "Full Name",
+    },
+    { id: 2, label: "Phone Number", type: "tel", placeholder: "012 345 6789" },
+    { id: 3, label: "Preferred Date", type: "date" },
+    { id: 4, label: "Preferred Time", type: "time" },
+    {
+      id: 5,
+      label: "Reason for Appointment",
+      type: "textarea",
+      placeholder: "Briefly describe the reason...",
+    },
+  ],
+
+  // === KHMER FORM TYPES ===
+
   អាពាហ៍ពិពាហ៍: [
     {
       id: 1,
@@ -206,6 +270,46 @@ const formSchemas = {
       options: ["ក្រុម A", "ក្រុម B", "ក្រុម C"],
     },
     { id: 4, label: "លេខទូរស័ព្ទ", type: "text", placeholder: "០១២ ៣៤៥ ៦៧៨" },
+  ],
+  ដាក់ពាក្យបណ្តឹង: [
+    {
+      id: 1,
+      label: "ឈ្មោះអ្នកប្តឹង",
+      type: "text",
+      placeholder: "បញ្ចូលឈ្មោះរបស់អ្នក",
+    },
+    { id: 2, label: "លេខទូរស័ព្ទ", type: "tel", placeholder: "០១២ ៣៤៥ ៦៧៨" },
+    { id: 3, label: "កាលបរិច្ឆេទកើតហេតុ", type: "date" },
+    {
+      id: 4,
+      label: "ប្រភេទបណ្តឹង",
+      type: "select",
+      options: ["សេវាកម្មមិនល្អ", "ទំនិញខូចគុណភាព", "បញ្ហាដឹកជញ្ជូន", "ផ្សេងៗ"],
+    },
+    {
+      id: 5,
+      label: "ពណ៌នាពីបញ្ហា",
+      type: "textarea",
+      placeholder: "សូមសរសេរលម្អិតពីបញ្ហាដែលបានកើតឡើង...",
+    },
+    { id: 6, label: "ឯកសារភ្ជាប់ (បើមាន)", type: "file" },
+  ],
+  កក់ការណាត់ជួប: [
+    {
+      id: 1,
+      label: "ឈ្មោះអតិថិជន",
+      type: "text",
+      placeholder: "បញ្ចូលឈ្មោះរបស់អ្នក",
+    },
+    { id: 2, label: "លេខទូរស័ព្ទ", type: "tel", placeholder: "០១២ ៣៤៥ ៦៧៨" },
+    { id: 3, label: "កាលបរិច្ឆេទចង់ជួប", type: "date" },
+    { id: 4, label: "ម៉ោង", type: "time" },
+    {
+      id: 5,
+      label: "គោលបំណង",
+      type: "textarea",
+      placeholder: "មូលហេតុនៃការណាត់ជួប...",
+    },
   ],
 };
 

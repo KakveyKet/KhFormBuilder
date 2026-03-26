@@ -1,18 +1,18 @@
 <template>
-  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] font-inter overflow-hidden">
+  <div class="h-screen w-full flex flex-col bg-[#F8FAFF] overflow-hidden">
 
     <!-- ================= TOP TOOLBAR ================= -->
     <header
-      class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-10 shadow-sm">
+      class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-sm">
       <div class="flex items-center gap-4">
-        <button @click="$router.go(-1)"
+        <a href="/dashboard"
           class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#5855F6] transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
           Back
-        </button>
+        </a>
         <div class="h-5 w-px bg-gray-200"></div>
         <div class="flex items-center gap-2">
           <div class="w-6 h-6 bg-[#5855F6] rounded-md flex items-center justify-center">
@@ -45,7 +45,7 @@
           <span class="hidden sm:inline">Share</span>
         </button>
 
-        <router-link v-if="currentFormId && formLoaded" :to="`/preview/f/${currentFormId}`" target="_blank"
+        <router-link v-if="currentFormId && formLoaded" :to="`/public/${currentFormId}`" target="_blank"
           class="px-3 sm:px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -72,12 +72,77 @@
     <!-- ================= MAIN STUDIO LAYOUT ================= -->
     <div class="flex-1 flex overflow-hidden">
 
-      <!-- LEFT SIDEBAR: Elementor-Style Palette -->
-      <aside class="w-[300px] bg-white border-r border-gray-200 flex-shrink-0 flex flex-col hidden md:flex">
+      <!-- LEFT SIDEBAR -->
+      <aside
+        class="w-[300px] bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto hidden md:block relative z-10 pb-10">
 
-        <!-- Form Details + Text Editor Toolbars -->
-        <div class="p-5 border-b border-gray-100 flex-shrink-0 space-y-5">
+        <div class="p-5 border-b border-gray-100 space-y-5">
           <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Form Content</label>
+
+          <!-- Cover Image Upload -->
+          <div class="space-y-2 pb-4 border-b border-gray-100">
+            <label class="block text-[12px] font-bold text-gray-600">Cover Image</label>
+            <input type="file" accept="image/*" @change="handleCoverUpload"
+              class="w-full text-xs cursor-pointer file:mr-2 file:py-1.5 file:px-3 file:border-0 file:rounded-md file:text-xs file:font-bold file:bg-[#5855F6]/10 file:text-[#5855F6] hover:file:bg-[#5855F6]/20 transition-all" />
+
+            <div v-if="formData.cover_image && formData.cover_image.url"
+              class="flex items-center justify-between bg-gray-50 p-2 rounded-md mt-2 border border-gray-200">
+              <div class="flex items-center gap-2 truncate">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span class="text-[11px] font-medium text-gray-600 truncate">{{ formData.cover_image.name }}</span>
+              </div>
+              <button @click="removeCoverImage" class="text-gray-400 hover:text-red-500 transition-colors p-1"
+                title="Remove Cover">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Header Attachment Upload -->
+          <div class="space-y-2 pb-4 border-b border-gray-100">
+            <label class="block text-[12px] font-bold text-gray-600">Header Attachment (Logo/Doc)</label>
+            <input type="file" @change="handleHeaderUpload"
+              class="w-full text-xs cursor-pointer file:mr-2 file:py-1.5 file:px-3 file:border-0 file:rounded-md file:text-xs file:font-bold file:bg-[#5855F6]/10 file:text-[#5855F6] hover:file:bg-[#5855F6]/20 transition-all" />
+
+            <div v-if="formData.header_file && formData.header_file.url"
+              class="flex items-center justify-between bg-gray-50 p-2 rounded-md mt-2 border border-gray-200">
+              <div class="flex items-center gap-2 truncate">
+                <svg v-if="formData.header_file.type === 'image'" xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+                <span class="text-[11px] font-medium text-gray-600 truncate">{{ formData.header_file.name }}</span>
+              </div>
+              <button @click="removeHeaderFile" class="text-gray-400 hover:text-red-500 transition-colors p-1"
+                title="Remove Attachment">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
 
           <!-- Title Section -->
           <div class="space-y-2">
@@ -258,7 +323,7 @@
           </div>
         </div>
 
-        <div class="p-5 border-b border-gray-100 flex-shrink-0">
+        <div class="p-5 border-b border-gray-100">
           <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Form Theme</label>
           <div v-if="templates.length === 0" class="text-xs text-gray-400 animate-pulse">Loading themes...</div>
           <div v-else class="grid grid-cols-2 gap-2">
@@ -271,8 +336,8 @@
           </div>
         </div>
 
-        <!-- Draggable Elements Palette -->
-        <div class="flex-1 overflow-y-auto p-5 bg-gray-50/50">
+        <!-- Draggable Elements Palette (Always sits at the bottom of the scroll flow) -->
+        <div class="p-5 bg-gray-50/50 border-t border-gray-100 h-full">
           <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Components</label>
           <p class="text-[11px] text-gray-400 mb-4 leading-tight">Drag and drop elements into your canvas.</p>
 
@@ -291,10 +356,11 @@
         </div>
       </aside>
 
-      <!-- CENTRAL CANVAS: Form Builder Area -->
-      <main class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center scroll-smooth bg-[#F8FAFF]">
+      <!-- CENTRAL CANVAS -->
+      <main
+        class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start scroll-smooth bg-[#F8FAFF] relative z-0">
         <!-- Loading State -->
-        <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
+        <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 mt-20">
           <svg class="animate-spin h-8 w-8 text-[#5855F6] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -305,9 +371,16 @@
           <p class="text-gray-500 font-medium text-sm">Booting AI Studio...</p>
         </div>
 
-        <!-- Editor Paper with Dynamic Theme Injection -->
+        <!-- Editor Paper -->
         <div v-else-if="formLoaded" :style="activeThemeStyle"
-          class="w-full max-w-2xl shadow-xl shadow-gray-200/50 rounded-xl min-h-[800px] border border-[var(--tpl-border)] bg-[var(--tpl-bg)] text-[var(--tpl-text)] relative flex flex-col animate-fade-up transition-colors duration-500 overflow-hidden">
+          class="w-full max-w-2xl shadow-xl shadow-gray-200/50 rounded-xl min-h-[800px] border border-[var(--tpl-border)] bg-[var(--tpl-bg)] text-[var(--tpl-text)] relative flex flex-col animate-fade-up transition-colors duration-500 overflow-hidden mb-12">
+
+          <!-- Cover Image Display in Editor -->
+          <div v-if="formData.cover_image && formData.cover_image.url"
+            class="w-full h-32 sm:h-48 lg:h-56 relative border-b flex-shrink-0"
+            style="border-color: var(--tpl-border);">
+            <img :src="formData.cover_image.url" class="w-full h-full object-cover" />
+          </div>
 
           <!-- Paper Header -->
           <div class="p-6 sm:p-10 pb-6 border-b border-[var(--tpl-border)] flex-shrink-0 relative">
@@ -319,9 +392,26 @@
               </span>
             </div>
 
+            <!-- Dynamic Header Attachment Display in Editor -->
+            <div v-if="formData.header_file && formData.header_file.url" class="mb-6 flex"
+              :style="{ justifyContent: formData.typography?.title?.align || 'left' }">
+              <img v-if="formData.header_file.type === 'image'" :src="formData.header_file.url"
+                class="max-h-24 object-contain rounded-md shadow-sm border border-gray-100" />
+              <a v-else :href="formData.header_file.url" :download="formData.header_file.name"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-bold transition-all shadow-sm hover:shadow-md"
+                style="border-color: var(--tpl-primary); color: var(--tpl-primary); background-color: color-mix(in srgb, var(--tpl-primary) 5%, transparent);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download {{ formData.header_file.name }}
+              </a>
+            </div>
+
             <!-- Dynamic Canvas Title applying typography styles -->
             <input v-if="formData.typography" v-model="formData.title"
-              class="w-full mt-4 text-2xl sm:text-3xl bg-transparent border-none focus:ring-0 p-0 mb-2 outline-none"
+              class="w-full mt-2 text-2xl sm:text-3xl bg-transparent border-none focus:ring-0 p-0 mb-2 outline-none"
               :style="{
                 color: formData.typography.title.color || 'var(--tpl-text)',
                 textAlign: formData.typography.title.align,
@@ -363,13 +453,17 @@
             <!-- Dynamic Fields -->
             <draggable v-if="Array.isArray(formData.schema)" :list="formData.schema" :animation="200"
               group="form-builder" handle=".drag-handle-zone" ghost-class="opacity-40"
-              class="relative z-10 min-h-[300px] space-y-3 w-full" @start="activeFieldIndex = null"
+              class="relative z-10 min-h-[300px] space-y-3 w-full pb-10" @start="activeFieldIndex = null"
               @change="onCanvasChange">
               <div v-for="(element, index) in formData.schema" :key="element.id || index"
                 class="relative flex items-center gap-3 p-3 sm:p-4 border rounded-xl transition-all cursor-pointer group"
-                :class="activeFieldIndex === index ? 'border-transparent shadow-sm' : 'border-[var(--tpl-border)] bg-[var(--tpl-bg)]'"
+                :class="[
+                  activeFieldIndex === index ? 'border-transparent shadow-sm' : 'border-[var(--tpl-border)] bg-[var(--tpl-bg)]',
+                  element.type === 'page-break' ? 'border-dashed border-2 py-6' : ''
+                ]"
                 :style="activeFieldIndex === index ? 'box-shadow: 0 0 0 2px var(--tpl-primary); background-color: color-mix(in srgb, var(--tpl-primary) 5%, transparent);' : ''"
                 @click="activeFieldIndex = index">
+
                 <!-- Drag Handle Icon -->
                 <div
                   class="drag-handle-zone cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 p-1 -ml-2 hidden sm:block">
@@ -384,8 +478,8 @@
                   </svg>
                 </div>
 
-                <!-- Visual Component Icon -->
-                <div
+                <!-- Visual Component Icon (Hidden for Page Break to look cleaner) -->
+                <div v-if="element.type !== 'page-break'"
                   class="w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm flex-shrink-0 transition-colors"
                   :style="activeFieldIndex === index ? 'color: var(--tpl-primary); border-color: color-mix(in srgb, var(--tpl-primary) 30%, transparent); background-color: var(--tpl-bg);' : 'color: #9ca3af; background-color: var(--tpl-bg); border-color: var(--tpl-border);'">
                   <span v-html="getFieldIcon(element.type)"></span>
@@ -393,30 +487,41 @@
 
                 <!-- Field Content (Mock UI) -->
                 <div class="flex-1 flex flex-col gap-1.5 pointer-events-none min-w-0">
-                  <label class="text-sm font-bold truncate" style="color: var(--tpl-text);">
-                    {{ element.label || "Untitled Field" }}
-                    <!-- 🌟 NEW: Render red asterisk if field is marked required -->
-                    <span v-if="element.required" class="text-red-500 ml-1">*</span>
-                  </label>
 
-                  <div class="px-3 py-2 border rounded-md text-sm truncate flex items-center opacity-70"
-                    style="background-color: color-mix(in srgb, var(--tpl-text) 5%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);">
-                    <template v-if="element.type === 'checkbox'">Check to agree</template>
-                    <template v-else-if="element.type === 'color'">
-                      <div class="w-4 h-4 rounded mr-2 flex-shrink-0" style="background-color: var(--tpl-primary);">
-                      </div>Pick a color
-                    </template>
-                    <template v-else-if="element.type === 'file'">
-                      <div class="border px-2 py-0.5 rounded text-xs mr-2 font-bold shadow-sm"
-                        style="background-color: var(--tpl-bg); border-color: var(--tpl-border); color: var(--tpl-text);">
-                        Choose File</div>No file chosen
-                    </template>
-                    <template v-else-if="element.type === 'range'">
-                      <input type="range" class="w-full pointer-events-none opacity-50"
-                        style="accent-color: var(--tpl-primary);" />
-                    </template>
-                    <template v-else>{{ element.placeholder || "Input field preview..." }}</template>
+                  <!-- 🌟 Page Break Layout -->
+                  <div v-if="element.type === 'page-break'" class="w-full py-2 flex items-center gap-4">
+                    <div class="h-px flex-1 opacity-50" style="background-color: var(--tpl-text);"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest px-2"
+                      style="color: var(--tpl-primary);">Step Break: {{ element.label || 'Next Page' }}</span>
+                    <div class="h-px flex-1 opacity-50" style="background-color: var(--tpl-text);"></div>
                   </div>
+
+                  <!-- Standard Field Layout -->
+                  <template v-else>
+                    <label class="text-sm font-bold truncate" style="color: var(--tpl-text);">
+                      {{ element.label || "Untitled Field" }}
+                      <span v-if="element.required" class="text-red-500 ml-1">*</span>
+                    </label>
+
+                    <div class="px-3 py-2 border rounded-md text-sm truncate flex items-center opacity-70"
+                      style="background-color: color-mix(in srgb, var(--tpl-text) 5%, var(--tpl-bg)); border-color: var(--tpl-border); color: var(--tpl-text);">
+                      <template v-if="element.type === 'checkbox'">Check to agree</template>
+                      <template v-else-if="element.type === 'color'">
+                        <div class="w-4 h-4 rounded mr-2 flex-shrink-0" style="background-color: var(--tpl-primary);">
+                        </div>Pick a color
+                      </template>
+                      <template v-else-if="element.type === 'file'">
+                        <div class="border px-2 py-0.5 rounded text-xs mr-2 font-bold shadow-sm"
+                          style="background-color: var(--tpl-bg); border-color: var(--tpl-border); color: var(--tpl-text);">
+                          Choose File</div>No file chosen
+                      </template>
+                      <template v-else-if="element.type === 'range'">
+                        <input type="range" class="w-full pointer-events-none opacity-50"
+                          style="accent-color: var(--tpl-primary);" />
+                      </template>
+                      <template v-else>{{ element.placeholder || "Input field preview..." }}</template>
+                    </div>
+                  </template>
                 </div>
 
                 <!-- Delete Action -->
@@ -434,11 +539,34 @@
                 </div>
               </div>
             </draggable>
+
+            <!-- Mock Multi-step navigation buttons to preview final layout in Studio -->
+            <div class="flex items-center gap-4 mt-6 border-t pt-8 pointer-events-none"
+              style="border-color: var(--tpl-border);">
+              <div class="w-14 h-14 flex items-center justify-center font-bold rounded-xl shadow-sm flex-shrink-0"
+                style="background-color: color-mix(in srgb, var(--tpl-text) 5%, transparent); color: var(--tpl-text);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </div>
+
+              <div
+                class="flex-1 h-14 flex justify-center items-center gap-3 text-white font-bold text-[18px] rounded-xl shadow-md"
+                style="background-color: var(--tpl-primary);">
+                Next / Submit
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+
           </div>
         </div>
 
         <!-- Error State -->
-        <div v-else class="text-center py-20 m-auto">
+        <div v-else class="text-center py-20 m-auto mt-20">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none"
             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -446,10 +574,8 @@
           </svg>
           <h2 class="text-xl font-bold text-gray-900 mb-2">Instance Not Found</h2>
           <p class="text-gray-500 mb-6">{{ errorMessage || "Could not find a valid form ID." }}</p>
-          <router-link :to="$router.go(-1)"
-            class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
-            to
-            Hub</router-link>
+          <router-link to="/dashboard" class="px-6 py-2.5 bg-[#5855F6] text-white font-bold rounded-lg shadow-sm">Return
+            to Hub</router-link>
         </div>
       </main>
 
@@ -464,19 +590,22 @@
 
           <div class="space-y-5">
             <div>
-              <label class="block text-[11px] font-bold text-gray-500 mb-1">Label Text</label>
+              <!-- 🌟 UPDATED: Dynamic Label for Page Break -->
+              <label class="block text-[11px] font-bold text-gray-500 mb-1">
+                {{ activeField.type === 'page-break' ? 'Step Title (Next Page)' : 'Label Text' }}
+              </label>
               <input v-model="activeField.label"
                 class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-[#5855F6] outline-none transition-all" />
             </div>
 
-            <div v-if="!['checkbox', 'color', 'range', 'file'].includes(activeField.type)">
+            <div v-if="!['checkbox', 'color', 'range', 'file', 'page-break'].includes(activeField.type)">
               <label class="block text-[11px] font-bold text-gray-500 mb-1">Input Placeholder</label>
               <input v-model="activeField.placeholder"
                 class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:bg-white focus:ring-2 focus:ring-[#5855F6] outline-none transition-all" />
             </div>
 
             <!-- Component Type Dropdown -->
-            <div class="relative">
+            <div class="relative" v-if="activeField.type !== 'page-break'">
               <label class="block text-[11px] font-bold text-gray-500 mb-1">Component Type</label>
               <div @click="isTypeDropdownOpen = !isTypeDropdownOpen"
                 class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm flex items-center justify-between cursor-pointer hover:bg-white transition-all"
@@ -517,8 +646,9 @@
               </div>
             </div>
 
-            <!-- 🌟 NEW: Required Field Toggle Switch -->
-            <div class="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
+            <!-- Required Field Toggle Switch -->
+            <div v-if="activeField.type !== 'page-break'"
+              class="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
               <label class="text-[11px] font-bold text-gray-500 uppercase tracking-widest cursor-pointer"
                 @click="activeField.required = !activeField.required">
                 Required Field
@@ -602,6 +732,8 @@ const formData = ref({
     title: { align: "left", color: "", decoration: "none", weight: "bold", style: "normal", size: "" },
     description: { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" }
   },
+  header_file: { url: "", name: "", type: "" },
+  cover_image: { url: "", name: "" },
   schema: [],
 });
 
@@ -622,13 +754,49 @@ const activeThemeStyle = computed(() => {
   };
 });
 
-// Toolbar function to toggle rich text styles
 const toggleStyle = (element, property, activeValue, inactiveValue) => {
   if (formData.value.typography[element][property] === activeValue) {
     formData.value.typography[element][property] = inactiveValue;
   } else {
     formData.value.typography[element][property] = activeValue;
   }
+};
+
+const handleCoverUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    formData.value.cover_image = {
+      url: event.target.result,
+      name: file.name
+    };
+  };
+  reader.readAsDataURL(file);
+};
+
+const removeCoverImage = () => {
+  formData.value.cover_image = { url: "", name: "" };
+};
+
+const handleHeaderUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    formData.value.header_file = {
+      url: event.target.result,
+      name: file.name,
+      type: file.type.startsWith('image/') ? 'image' : 'document'
+    };
+  };
+  reader.readAsDataURL(file);
+};
+
+const removeHeaderFile = () => {
+  formData.value.header_file = { url: "", name: "", type: "" };
 };
 
 // --- Lifecycle & Fetching ---
@@ -678,6 +846,9 @@ const fetchForm = async () => {
       if (!formData.value.typography.description) formData.value.typography.description = { align: "left", color: "", decoration: "none", weight: "normal", style: "normal", size: "" };
     }
 
+    if (!formData.value.header_file) formData.value.header_file = { url: "", name: "", type: "" };
+    if (!formData.value.cover_image) formData.value.cover_image = { url: "", name: "" };
+
     if (!Array.isArray(formData.value.schema)) formData.value.schema = [];
     formLoaded.value = true;
     if (formData.value.schema.length > 0) activeFieldIndex.value = 0;
@@ -713,7 +884,9 @@ const saveChanges = async () => {
       description: formData.value.description,
       template_id: formData.value.template_id,
       schema: formData.value.schema,
-      typography: formData.value.typography
+      typography: formData.value.typography,
+      header_file: formData.value.header_file,
+      cover_image: formData.value.cover_image
     });
     successMessage.value = "Saved successfully!";
     setTimeout(() => { successMessage.value = ""; }, 3000);
@@ -730,7 +903,7 @@ const activeField = computed(() => {
   return formData.value.schema[activeFieldIndex.value];
 });
 
-// 🌟 UPDATED: Set default required states for palette elements
+// 🌟 NEW: Added "Page Break" to palette
 const paletteElements = [
   { type: "text", label: "Short Text", placeholder: "Type text here...", required: false },
   { type: "textarea", label: "Long Text", placeholder: "Type paragraph here...", required: false },
@@ -742,6 +915,7 @@ const paletteElements = [
   { type: "date", label: "Date Picker", placeholder: "", required: false },
   { type: "file", label: "File Upload", placeholder: "", required: false },
   { type: "color", label: "Color Picker", placeholder: "", required: false },
+  { type: "page-break", label: "Page Break", placeholder: "Next Step", required: false }
 ];
 
 const cloneElement = (element) => {
@@ -758,11 +932,14 @@ const onCanvasChange = (evt) => {
 };
 
 const isTypeDropdownOpen = ref(false);
+
+// 🌟 NEW: Added Layout group to dropdown
 const fieldTypes = [
   { group: "Text Inputs", items: [{ value: "text", label: "Short Text" }, { value: "textarea", label: "Long Text" }, { value: "email", label: "Email Address" }, { value: "tel", label: "Phone Number" }, { value: "url", label: "Website URL" }, { value: "password", label: "Password" }] },
   { group: "Numeric & Data", items: [{ value: "number", label: "Numeric Value" }, { value: "range", label: "Slider (Range)" }, { value: "file", label: "File Upload" }, { value: "color", label: "Color Picker" }] },
   { group: "Date & Time", items: [{ value: "date", label: "Date Picker" }, { value: "time", label: "Time Picker" }, { value: "datetime-local", label: "Date & Time" }] },
   { group: "Choices", items: [{ value: "select", label: "Selection Dropdown" }, { value: "radio", label: "Choice Buttons" }, { value: "checkbox", label: "Toggle/Check" }] },
+  { group: "Layout", items: [{ value: "page-break", label: "Page Break (Multi-Step)" }] }
 ];
 
 const getFieldLabel = (type) => {
@@ -843,6 +1020,7 @@ const getFieldIcon = (type) => {
     select: `<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m8 10 4 4 4-4"/>`,
     radio: `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>`,
     checkbox: `<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>`,
+    "page-break": `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 12h16M8 8l-4 4 4 4m8-8l4 4-4 4" />`
   };
 
   const svgPaths = icons[type] || `<circle cx="12" cy="12" r="10"/>`;

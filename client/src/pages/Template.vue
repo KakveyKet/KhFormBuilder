@@ -128,7 +128,7 @@
 
     <!-- Simple Footer -->
     <!-- <footer class="py-8 text-center text-gray-400 text-sm border-t border-gray-200 bg-white">
-       © {{ new Date().getFullYear() }} លំហ.AI Form. All rights reserved.
+       © {{ new Date().getFullYear() }} លំហ Form. All rights reserved.
     </footer> -->
   </div>
 </template>

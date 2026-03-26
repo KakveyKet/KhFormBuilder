@@ -229,9 +229,9 @@ const dynamicRouter = (app) => {
   });
 
   // PUT route
-  app.put("/api/forms/:id", async (req, res) => {
+    app.put("/api/forms/:id", async (req, res) => {
     try {
-      // 🌟 UPDATED: Extract all the new fields from the request body!
+      // 🌟 Extract all properties from the frontend
       const { 
         title, 
         description, 
@@ -239,11 +239,12 @@ const dynamicRouter = (app) => {
         template_id, 
         typography, 
         theme_settings, 
-        is_published 
+        is_published,
+        header_file,   // 🌟 From previous step
+        cover_image    // 🌟 NEW: Cover image support
       } = req.body;
       
-      // Build the update object dynamically so we only update what is sent
-      const updateData = { updated_at: Date.now() };
+      const updateData = {};
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;
       if (schema !== undefined) updateData.schema = schema;
@@ -251,6 +252,8 @@ const dynamicRouter = (app) => {
       if (typography !== undefined) updateData.typography = typography;
       if (theme_settings !== undefined) updateData.theme_settings = theme_settings;
       if (is_published !== undefined) updateData.is_published = is_published;
+      if (header_file !== undefined) updateData.header_file = header_file;
+      if (cover_image !== undefined) updateData.cover_image = cover_image;
 
       const updatedForm = await Form.findByIdAndUpdate(
         req.params.id,

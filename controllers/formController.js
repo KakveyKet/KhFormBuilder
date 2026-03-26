@@ -37,16 +37,51 @@ exports.getFormById = async (req, res) => {
 // Update a form
 exports.updateForm = async (req, res) => {
   try {
-    const updatedForm = await Form.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      
-    });
+    // 1. Extract EVERYTHING we might receive from EditForm.vue
+    const {
+      title,
+      description,
+      schema,
+      template_id,
+      typography,
+      header_file, // 🌟 NEW
+      cover_image, // 🌟 NEW
+      theme_settings,
+      is_published,
+    } = req.body;
+
+    // 2. Build the update object dynamically so we only update what is sent
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (schema !== undefined) updateData.schema = schema;
+    if (template_id !== undefined) updateData.template_id = template_id;
+    if (typography !== undefined) updateData.typography = typography;
+    if (header_file !== undefined) updateData.header_file = header_file; // 🌟 NEW
+    if (cover_image !== undefined) updateData.cover_image = cover_image; // 🌟 NEW
+    if (theme_settings !== undefined)
+      updateData.theme_settings = theme_settings;
+    if (is_published !== undefined) updateData.is_published = is_published;
+
+    // 3. Find the form and update it
+    const updatedForm = await Form.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true },
+    );
+
     if (!updatedForm) {
-      return res.status(404).json({ message: "Form not found" });
+      return res.status(404).json({ error: "Form not found" });
     }
-    res.status(200).json(updatedForm);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+
+    // 4. Return success
+    res.status(200).json({
+      message: "Form updated successfully!",
+      form: updatedForm,
+    });
+  } catch (error) {
+    console.error("Update form error:", error);
+    res.status(500).json({ error: "Internal Server Error. Failed to update." });
   }
 };
 

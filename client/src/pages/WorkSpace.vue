@@ -1,20 +1,20 @@
 <template>
   <div class="ws-layout relative">
-    
-    <!-- 🌟 NEW: Global Toast Notification for Copying -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="transform translate-y-4 opacity-0"
-      enter-to-class="transform translate-y-0 opacity-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="transform translate-y-0 opacity-100"
-      leave-to-class="transform translate-y-4 opacity-0"
-    >
-      <div v-if="toastMessage" class="fixed bottom-10 right-10 z-50 bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
-         <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-400 w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-          </svg>
-         <span class="font-bold text-sm">{{ toastMessage }}</span>
+
+    <!-- 🌟 Global Toast Notification -->
+    <transition enter-active-class="transition duration-300 ease-out"
+      enter-from-class="transform translate-y-4 opacity-0" enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in" leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform translate-y-4 opacity-0">
+      <div v-if="toastMessage"
+        class="fixed bottom-10 right-10 z-50 bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="text-emerald-400 w-5 h-5" viewBox="0 0 20 20"
+          fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd" />
+        </svg>
+        <span class="font-bold text-sm">{{ toastMessage }}</span>
       </div>
     </transition>
 
@@ -74,7 +74,7 @@
             <rect width="7" height="7" x="14" y="14" rx="1" />
             <rect width="7" height="7" x="3" y="14" rx="1" />
           </svg>
-          workspace
+          Workspace
         </a>
         <a href="#" class="ws-nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -107,7 +107,7 @@
             </div>
             <span
               class="text-[10px] font-bold text-gray-500 bg-white px-2 py-0.5 rounded shadow-sm border border-gray-100">{{
-              tokensRemaining }} Left</span>
+                tokensRemaining }} Left</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
             <div class="bg-gradient-to-r from-[#5855F6] to-[#F0428A] h-1.5 rounded-full transition-all duration-1000"
@@ -168,6 +168,7 @@
 
       <!-- Scrollable Workspace Area -->
       <div class="ws-content">
+
         <div class="ws-section-header">
           <div class="mb-4 sm:mb-0">
             <h1 class="ws-section-title">My Workspace</h1>
@@ -232,6 +233,35 @@
           </div>
         </div>
 
+        <!-- 🌟 NEW: Bulk Action Bar -->
+        <transition enter-active-class="transition duration-300 ease-out"
+          enter-from-class="transform -translate-y-4 opacity-0" enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition duration-200 ease-in" leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform -translate-y-4 opacity-0">
+          <div v-if="selectedForms.length > 0"
+            class="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6 shadow-sm">
+            <div class="flex items-center gap-4">
+              <input type="checkbox" :checked="selectedForms.length === forms.length" @change="toggleSelectAll"
+                class="w-5 h-5 rounded border-gray-300 text-[#5855F6] focus:ring-[#5855F6] cursor-pointer shadow-sm" />
+              <span class="text-sm font-bold text-indigo-800">{{ selectedForms.length }} form(s) selected</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button @click="selectedForms = []"
+                class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">Cancel</button>
+              <button @click="openDeleteModal(selectedForms)"
+                class="px-4 py-2 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-md transition-colors flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+                Delete Selected
+              </button>
+            </div>
+          </div>
+        </transition>
+
         <!-- Loading State -->
         <div v-if="isLoading" class="ws-loader-container">
           <div class="ws-spinner"></div>
@@ -266,9 +296,19 @@
 
         <!-- Form Grid -->
         <div v-else class="ws-grid">
-          <div v-for="(form, index) in forms" :key="form._id" class="ws-card group">
+          <div v-for="(form, index) in forms" :key="form._id" class="ws-card group"
+            :class="{ 'ring-2 ring-[#5855F6] shadow-lg': selectedForms.includes(form._id) }">
+
             <!-- CSS Mini-Form Thumbnail -->
-            <div class="ws-card-preview" :class="getCardColor(index)">
+            <div class="ws-card-preview relative" :class="getCardColor(index)">
+
+              <!-- 🌟 NEW: Multi-Select Checkbox -->
+              <div class="absolute top-4 left-4 z-20"
+                :class="{ 'opacity-100': selectedForms.includes(form._id), 'opacity-0 group-hover:opacity-100': !selectedForms.includes(form._id) }">
+                <input type="checkbox" :value="form._id" v-model="selectedForms"
+                  class="w-5 h-5 rounded border-2 border-white shadow-sm text-[#5855F6] focus:ring-[#5855F6] cursor-pointer transition-all" />
+              </div>
+
               <div class="ws-mini-form">
                 <div class="w-1/2 h-2 bg-gray-200 rounded-full mb-3"></div>
                 <div class="w-full h-5 bg-white rounded border border-gray-100 shadow-sm"></div>
@@ -298,7 +338,7 @@
 
                 <!-- Quick Actions (Hover) -->
                 <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white pl-2">
-                  
+
                   <!-- Edit Button -->
                   <button @click="editForm(form._id)"
                     class="p-1.5 text-gray-400 hover:text-theme-primary hover:bg-theme-primary/10 rounded-md transition-colors"
@@ -309,7 +349,7 @@
                     </svg>
                   </button>
 
-                  <!-- 🌟 NEW: Copy Share Link Button -->
+                  <!-- Copy Share Link Button -->
                   <button @click="copyShareLink(form._id)"
                     class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
                     title="Copy Share Link">
@@ -323,10 +363,10 @@
                   <!-- Publish/Unpublish Button -->
                   <button @click="openPublishModal(form)" class="p-1.5 text-gray-400 rounded-md transition-colors"
                     :class="form.is_published
-                        ? 'hover:text-orange-500 hover:bg-orange-50'
-                        : 'hover:text-emerald-500 hover:bg-emerald-50'
+                      ? 'hover:text-orange-500 hover:bg-orange-50'
+                      : 'hover:text-emerald-500 hover:bg-emerald-50'
                       " :title="form.is_published ? 'Unpublish Form' : 'Publish Form'
-                      ">
+                        ">
                     <svg v-if="form.is_published" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                       viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                       stroke-linejoin="round">
@@ -343,8 +383,8 @@
                     </svg>
                   </button>
 
-                  <!-- Delete Button -->
-                  <button @click="openDeleteModal(form._id)"
+                  <!-- 🌟 UPDATED: Delete Button (Passes array) -->
+                  <button @click="openDeleteModal([form._id])"
                     class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                     title="Delete Form">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -364,7 +404,7 @@
 
     <!-- ================= CUSTOM MODALS ================= -->
 
-    <!-- Delete Confirmation Modal -->
+    <!-- 🌟 UPDATED: Delete Confirmation Modal (Handles multiple) -->
     <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95"
       enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-150 ease-in"
       leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
@@ -385,9 +425,12 @@
               <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Form?</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">
+            Delete {{ deleteModal.formIds.length > 1 ? `${deleteModal.formIds.length} Forms` : 'Form' }}?
+          </h3>
           <p class="text-sm text-gray-500 mb-6">
-            Are you sure you want to delete this form? This action cannot be
+            Are you sure you want to delete {{ deleteModal.formIds.length > 1 ? 'these forms' : 'this form' }}? This
+            action cannot be
             undone and you will lose all collected responses.
           </p>
           <div class="flex items-center gap-3">
@@ -420,8 +463,8 @@
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 overflow-hidden">
           <!-- Dynamic Icon (Green for Publish, Orange for Unpublish) -->
           <div class="w-12 h-12 rounded-full flex items-center justify-center mb-4" :class="!publishModal.form.is_published
-              ? 'bg-emerald-100 text-emerald-600'
-              : 'bg-orange-100 text-orange-600'
+            ? 'bg-emerald-100 text-emerald-600'
+            : 'bg-orange-100 text-orange-600'
             ">
             <svg v-if="!publishModal.form.is_published" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -459,8 +502,8 @@
             <button @click="executePublish" :disabled="isActionLoading"
               class="flex-1 px-4 py-2.5 font-bold rounded-xl text-white transition-colors shadow-md disabled:opacity-50 flex justify-center items-center"
               :class="!publishModal.form.is_published
-                  ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'
-                  : 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20'
+                ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'
+                : 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20'
                 ">
               <svg v-if="isActionLoading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">
@@ -495,12 +538,15 @@ const forms = ref([]);
 const isLoading = ref(true);
 const isSidebarOpen = ref(false);
 
-// 🌟 NEW: Toast Message State
+// 🌟 NEW: Multi-Select State
+const selectedForms = ref([]);
+
+// Toast Message State
 const toastMessage = ref("");
 
-// Modal & Actions State
+// 🌟 UPDATED: Modal & Actions State
 const isActionLoading = ref(false);
-const deleteModal = ref({ isOpen: false, formId: null });
+const deleteModal = ref({ isOpen: false, formIds: [] });
 const publishModal = ref({ isOpen: false, form: null });
 
 const tokensRemaining = computed(() => {
@@ -575,10 +621,18 @@ const goToProfile = () => {
   window.location.href = "/profile";
 };
 
-// 🌟 NEW: Copy Link Function
+// 🌟 NEW: Select All Toggle
+const toggleSelectAll = (event) => {
+  if (event.target.checked) {
+    selectedForms.value = forms.value.map(f => f._id);
+  } else {
+    selectedForms.value = [];
+  }
+};
+
 const copyShareLink = (id) => {
-  const url = `${window.location.origin}/public/f/${id || currentFormId.value}`;
-  
+  const url = `${window.location.origin}/public/${id || currentFormId.value}`;
+
   const el = document.createElement('textarea');
   el.value = url;
   document.body.appendChild(el);
@@ -590,34 +644,46 @@ const copyShareLink = (id) => {
   setTimeout(() => { toastMessage.value = ""; }, 3000);
 };
 
-// 🌟 MODAL HANDLERS
+// 🌟 UPDATED: MODAL HANDLERS
 const closeModals = () => {
-  deleteModal.value = { isOpen: false, formId: null };
+  deleteModal.value = { isOpen: false, formIds: [] };
   publishModal.value = { isOpen: false, form: null };
 };
 
-const openDeleteModal = (id) => {
-  deleteModal.value = { isOpen: true, formId: id };
+const openDeleteModal = (ids) => {
+  deleteModal.value = { isOpen: true, formIds: ids };
 };
 
 const openPublishModal = (form) => {
   publishModal.value = { isOpen: true, form: form };
 };
 
+// 🌟 UPDATED: Handle Multiple Deletions
 const executeDelete = async () => {
-  if (!deleteModal.value.formId) return;
+  if (!deleteModal.value.formIds || deleteModal.value.formIds.length === 0) return;
   isActionLoading.value = true;
 
   try {
-    await axios.delete(
-      `http://localhost:3000/api/formRoutes/${deleteModal.value.formId}`,
-    );
+    // Delete all selected forms using Promise.all to handle array
+    await Promise.all(deleteModal.value.formIds.map(id =>
+      axios.delete(`http://localhost:3000/api/formRoutes/${id}`)
+    ));
+
+    // Filter out the deleted forms from the UI
     forms.value = forms.value.filter(
-      (form) => form._id !== deleteModal.value.formId,
+      (form) => !deleteModal.value.formIds.includes(form._id)
     );
+
+    const count = deleteModal.value.formIds.length;
+    toastMessage.value = `${count} form${count > 1 ? 's' : ''} deleted successfully!`;
+    setTimeout(() => { toastMessage.value = ""; }, 3000);
+
+    selectedForms.value = []; // Clear selection
     closeModals();
   } catch (error) {
-    console.error("Error deleting form:", error);
+    console.error("Error deleting forms:", error);
+    toastMessage.value = "An error occurred while deleting.";
+    setTimeout(() => { toastMessage.value = ""; }, 3000);
   } finally {
     isActionLoading.value = false;
   }

@@ -8,7 +8,7 @@
           <rect width="32" height="32" rx="8" fill="#5855F6" />
           <circle cx="16" cy="16" r="6" fill="white" />
         </svg>
-        <span class="nav-logo-text">លំហ.AI</span>
+        <span class="nav-logo-text">លំហ Form</span>
       </a>
 
       <!-- Desktop Navigation Links -->

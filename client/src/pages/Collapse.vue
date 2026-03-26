@@ -77,7 +77,7 @@
                             class="absolute inset-0 rounded-2xl bg-[#5855F6] blur-xl opacity-40 -z-10 group-hover:opacity-60 transition-opacity duration-500">
                         </div>
                     </div>
-                    <span class="integrate-label font-extrabold text-[#0F172A] mt-4">លំហ.AI Form</span>
+                    <span class="integrate-label font-extrabold text-[#0F172A] mt-4">លំហ Form</span>
                 </div>
 
                 <!-- Line connecting Center to Right -->

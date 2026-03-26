@@ -6,7 +6,8 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors()); // Enable CORS for all routes
-
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Load environment variables from .env file
 dotenv.config();
 

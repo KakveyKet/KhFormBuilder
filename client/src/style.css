@@ -455,7 +455,7 @@ body {
   /* --- PROFILE SECTION --- */
   /* --- PROFILE SECTION --- */
   .profile-page-wrapper {
-    @apply min-h-screen bg-[#FAFBFF] py-16 px-4 font-sans;
+    @apply min-h-screen bg-[#FAFBFF] py-16 px-4;
   }
 
   .profile-container {
@@ -601,7 +601,7 @@ body {
 
   /* --- WORKSPACE LAYOUT (Refined & Responsive) --- */
   .ws-layout {
-    @apply flex h-screen w-full bg-[#F8FAFF] font-sans overflow-hidden text-gray-900;
+    @apply flex h-screen w-full bg-[#F8FAFF] overflow-hidden text-gray-900;
   }
 
   /* SIDEBAR */
@@ -792,7 +792,7 @@ body {
   }
   /* --- STUDIO / EDITOR LAYOUT --- */
   .studio-layout {
-    @apply flex flex-col h-screen bg-[#F8FAFF] font-sans overflow-hidden;
+    @apply flex flex-col h-screen bg-[#F8FAFF] overflow-hidden;
   }
 
   .studio-top-bar {

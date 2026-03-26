@@ -35,6 +35,19 @@ const formSchema = new mongoose.Schema(
       description: { type: textStyleSchema, default: () => ({}) },
     },
 
+    // 🌟 NEW: Cover Image (Hero Banner)
+    cover_image: {
+      url: { type: String, default: "" },
+      name: { type: String, default: "" },
+    },
+
+    // 🌟 NEW: Header File Attachment (Logo or Document)
+    header_file: {
+      url: { type: String, default: "" },
+      name: { type: String, default: "" },
+      type: { type: String, enum: ["image", "document", ""], default: "" },
+    },
+
     creator_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -48,11 +61,9 @@ const formSchema = new mongoose.Schema(
     is_published: { type: Boolean, default: false },
     public_hash: { type: String, unique: true, required: true },
     views: { type: Number, default: 0 },
-
-    // NOTE: We removed the manual created_at / updated_at fields here...
   },
   {
-    // 🌟 FIXED: ...and let Mongoose handle them automatically and safely here!
+    // Let Mongoose handle the timestamps automatically and safely!
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   },
 );

@@ -13,7 +13,7 @@
               <rect width="32" height="32" rx="8" fill="#5855F6"/>
               <circle cx="16" cy="16" r="6" fill="white"/>
             </svg>
-            <span class="footer-logo-text">លំហ.AI Form</span>
+            <span class="footer-logo-text">លំហ Form</span>
           </div>
           <p class="footer-desc">
             Making creativity accessible, playful, and powerful for everyone.
@@ -61,7 +61,7 @@
       <!-- Bottom Section: Copyright & Social -->
       <div class="footer-bottom">
         <p class="footer-copyright">
-          © 2026 លំហ.AI Form. All rights reserved.
+          © 2026 លំហ Form. All rights reserved.
         </p>
         
         <!-- <div class="footer-social-wrapper">

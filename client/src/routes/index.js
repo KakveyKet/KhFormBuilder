@@ -50,7 +50,7 @@ const routes = [
     component: Workspace,
   },
   {
-    path: "/preview/f/:id",
+    path: "/preview/:id",
     name: "preview",
     component: PreviewForm,
   },
