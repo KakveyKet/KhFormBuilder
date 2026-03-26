@@ -7,6 +7,7 @@ Sure! Here's a simple and ready-to-copy **README** for your project:
 
 ![KhFormBuilder Screenshot](https://res.cloudinary.com/dvljcimlz/image/upload/v1774512632/screencapture-localhost-5173-2026-03-25-09_31_17_woocdn.png)
 **Form Studio** is a drag drop fast easy for edit and update the component fast preview and public.
+s
 ![Form Studio](https://res.cloudinary.com/dvljcimlz/image/upload/v1774513300/Screenshot_2026-03-26_151739_kw7hih.png) 
 
 **Form workspace** controll your own form as you need.
