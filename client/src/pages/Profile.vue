@@ -3,6 +3,17 @@
     <div class="profile-container">
 
       <div class="profile-header-group">
+        <!-- 🌟 NEW: Back Button -->
+        <button @click="goBack"
+          class="flex items-center gap-2 mb-6 text-sm font-bold text-[#64748B] hover:text-[#5855F6] transition-colors w-fit group">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+            class="group-hover:-translate-x-1 transition-transform">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Back
+        </button>
+
         <h1 class="profile-title">Account Settings</h1>
         <p class="profile-subtitle">Manage your personal information, API usage, and plan preferences.</p>
       </div>
@@ -116,10 +127,17 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios"; // 🌟 NEEDED TO FETCH FROM DATABASE
+import axios from "axios";
+import { useRouter } from "vue-router"; // 🌟 NEEDED FOR BACK BUTTON
 
+const router = useRouter(); // Initialize router instance
 const user = ref(null);
-const isLoading = ref(true); // 🌟 ADDED LOADING STATE
+const isLoading = ref(true);
+
+// 🌟 NEW: Function to handle going back
+const goBack = () => {
+  router.back();
+};
 
 const tokensRemaining = computed(() => {
   if (!user.value) return 0;
@@ -149,8 +167,6 @@ onMounted(async () => {
   user.value = parsedUser; // Load basic local info first
 
   try {
-    // 🌟 FETCH FRESH DATA FROM MONGODB!
-    // This gives us the missing `role`, `created_at`, and `form_ids` array.
     const response = await axios.get(`http://localhost:3000/api/userRoutes/${parsedUser._id}`);
 
     user.value = response.data; // Replace basic info with complete database info
