@@ -10,6 +10,7 @@ Sure! Here's a simple and ready-to-copy **README** for your project:
 ## Table of Contents
 - [Description](#description)
 - [Features](#features)
+- [Demo](#demo)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -60,6 +61,10 @@ KhFormBuilder is designed to help users quickly create and manage forms without 
    ```
 
 Access the app at [http://localhost:3000](http://localhost:3000).
+
+## Demo
+You can try the live demo of KhFormBuilder here: [Live Demo](not yet hosting).
+
 
 ## Usage
 
