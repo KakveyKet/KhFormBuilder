@@ -87,4 +87,4 @@ This project is licensed under the MIT License.
 
 ---
 
-This should be **good to go** for your project’s README. Just copy and paste it!
+<!-- This should be **good to go** for your project’s README. Just copy and paste it! -->
