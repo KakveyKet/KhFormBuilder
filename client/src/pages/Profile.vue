@@ -129,7 +129,7 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router"; // 🌟 NEEDED FOR BACK BUTTON
-
+import { url } from "../../api";
 const router = useRouter(); // Initialize router instance
 const user = ref(null);
 const isLoading = ref(true);
@@ -167,7 +167,7 @@ onMounted(async () => {
   user.value = parsedUser; // Load basic local info first
 
   try {
-    const response = await axios.get(`http://localhost:3000/api/userRoutes/${parsedUser._id}`);
+    const response = await axios.get(`${url}/api/userRoutes/${parsedUser._id}`);
 
     user.value = response.data; // Replace basic info with complete database info
 

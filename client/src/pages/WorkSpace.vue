@@ -527,7 +527,7 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
-
+import { url } from "../../api";
 const route = useRoute();
 
 // Reactive State
@@ -581,7 +581,7 @@ onMounted(async () => {
     userInitial.value = parsedUser.email.charAt(0).toUpperCase();
 
     const userRes = await axios.get(
-      `http://localhost:3000/api/userRoutes/${parsedUser._id}`,
+      `${url}/api/userRoutes/${parsedUser._id}`,
     );
     user.value = userRes.data;
     if (user.value.plan_id) userPlanName.value = "Pro";
@@ -594,7 +594,7 @@ onMounted(async () => {
             : formIdRef;
         try {
           const response = await axios.get(
-            `http://localhost:3000/api/formRoutes/${actualId}`,
+            `${url}/api/formRoutes/${actualId}`,
           );
           return response.data;
         } catch (err) {
@@ -666,7 +666,7 @@ const executeDelete = async () => {
   try {
     // Delete all selected forms using Promise.all to handle array
     await Promise.all(deleteModal.value.formIds.map(id =>
-      axios.delete(`http://localhost:3000/api/formRoutes/${id}`)
+      axios.delete(`${url}/api/formRoutes/${id}`)
     ));
 
     // Filter out the deleted forms from the UI
@@ -697,7 +697,7 @@ const executePublish = async () => {
     const targetForm = publishModal.value.form;
     const newStatus = !targetForm.is_published;
 
-    await axios.put(`http://localhost:3000/api/formRoutes/${targetForm._id}`, {
+    await axios.put(`${url}/api/formRoutes/${targetForm._id}`, {
       is_published: newStatus,
     });
 

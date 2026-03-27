@@ -318,7 +318,7 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useRoute } from "vue-router";
-
+import { url } from '../../api';
 const route = useRoute();
 
 // State
@@ -417,7 +417,7 @@ onMounted(() => {
 const fetchForm = async () => {
     try {
         // Note: Assuming your endpoint maps to formRoutes as specified by your controller
-        const response = await axios.get(`http://localhost:3000/api/formRoutes/${formId.value}`);
+        const response = await axios.get(`${url}/api/formRoutes/${formId.value}`);
         const data = response.data;
 
         if (!data.typography) {

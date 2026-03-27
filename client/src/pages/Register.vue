@@ -194,7 +194,7 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-
+import { url } from "../../api";
 const form = ref({ email: "", password: "", confirmPassword: "" });
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -212,7 +212,7 @@ const handleRegister = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:3000/api/authRoutes/register",
+      `${url}/api/authRoutes/register`,
       {
         email: form.value.email,
         password: form.value.password,

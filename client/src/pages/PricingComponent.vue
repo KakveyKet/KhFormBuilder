@@ -134,7 +134,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
-
+import { url } from "../../api"; 
 // Reactive State
 const isLoading = ref(true);
 const tabs = ref([]);
@@ -164,7 +164,7 @@ const planMetadata = {
 onMounted(async () => {
   try {
     // 1. Fetch plans from MongoDB
-    const response = await axios.get("http://localhost:3000/api/planRoutes");
+    const response = await axios.get(`${url}/api/planRoutes`);
     const fetchedPlans = response.data;
 
     // 2. Format the database response for our UI
@@ -212,7 +212,7 @@ onMounted(async () => {
       const parsedUser = JSON.parse(storedUserStr);
       if (parsedUser && parsedUser._id) {
         const userRes = await axios.get(
-          `http://localhost:3000/api/userRoutes/${parsedUser._id}`,
+          `{url}/api/userRoutes/${parsedUser._id}`,
         );
         // Save the plan ID they are currently subscribed to
         currentUserPlanId.value = userRes.data.plan_id;

@@ -136,6 +136,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { url } from '../../api';
 
 const templates = ref([]);
 const isLoading = ref(true);
@@ -160,7 +161,7 @@ const fallbackTemplates = [
 
 onMounted(async () => {
   try {
-    const response = await axios.get("http://localhost:3000/api/templateRouter");
+    const response = await axios.get(`${url}/api/templateRouter`);
 
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
       // Force all fetched templates to 'free' just in case the backend still sends them as 'pro'
