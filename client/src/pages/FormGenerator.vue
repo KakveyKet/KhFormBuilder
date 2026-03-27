@@ -202,7 +202,7 @@
             <div
               class="mb-8 pb-6 border-b border-[var(--tpl-border)] flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div class="text-center sm:text-left">
-                <h2 class="text-2xl font-bold mb-2">{{ prediction || "Generated Form" }}</h2>
+                <!-- <h2 class="text-2xl font-bold mb-2">{{ prediction || "Generated Form" }}</h2> -->
                 <p class="text-sm opacity-70">Please fill out the form below.</p>
               </div>
               <div class="flex items-center justify-center sm:justify-end gap-2 hidden sm:flex"

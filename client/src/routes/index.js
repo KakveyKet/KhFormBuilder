@@ -10,6 +10,7 @@ import Template from "../pages/Template.vue";
 import Teams from "../pages/Teams.vue";
 import RequestQuote from "../pages/RequestQuote.vue";
 import PublicForm from "../pages/PublicForm.vue";
+import Solutions from "../pages/Solutions.vue";
 // auth
 import Register from "../pages/Register.vue";
 import Login from "../pages/Login.vue";
@@ -73,6 +74,11 @@ const routes = [
     path: "/request-quote",
     name: "request-quote",
     component: RequestQuote,
+  },
+  {
+    path: "/solutions",
+    name: "solutions",
+    component: Solutions
   }
 ];
 

@@ -15,8 +15,10 @@
       <nav class="nav-desktop-menu">
         <a href="#features" class="nav-link">Features</a>
         <a href="#collaborate " class="nav-link">Collaborate </a>
+        <router-link to="/solutions" class="nav-link">Solutions</router-link>
         <router-link to="/request-quote" class="nav-link">Contact</router-link>
         <router-link to="/teams" class="nav-link">About Us</router-link>
+
       </nav>
 
       <!-- Action Buttons -->
@@ -90,6 +92,7 @@
         <div class="flex flex-col p-2">
           <a href="#features" class="nav-mobile-link">Features</a>
           <a href="#collaborate" class="nav-mobile-link">Collaborate </a>
+          <router-link to="/solutions" class="nav-mobile-link">Solutions</router-link>
           <router-link to="/request-quote" class="nav-mobile-link">Contact</router-link>
           <router-link to="/teams" class="nav-mobile-link">About Us</router-link>
 

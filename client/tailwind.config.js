@@ -20,11 +20,11 @@ export default {
         },
       },
       // 2. Define your font families
-      fontFamily: {
-        inter: ["Inter", "sans-serif"],
-        roboto: ["Roboto", "sans-serif"],
-        lora: ["Lora", "serif"],
-      },
+      // fontFamily: {
+      //   inter: ["Inter", "sans-serif"],
+      //   roboto: ["Roboto", "sans-serif"],
+      //   lora: ["Lora", "serif"],
+      // },
     },
   },
   plugins: [require("tailwindcss-animated")],
